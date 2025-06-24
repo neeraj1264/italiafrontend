@@ -166,16 +166,16 @@ const Header = ({ headerName, setSearch, onClick }) => {
                 to="/advance"
               >
                 Setting
-              </NavLink>
+              </NavLink> 
             </li>
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <button
                 className="nav-link custom-text"
                 onClick={toggleTheme}
               >
                 {isDarkMode ? "Light Mode" : "Dark Mode"}
               </button>
-            </li>
+            </li> */}
             <li className="nav-item">
               <button
                 className="nav-link custom-text"
