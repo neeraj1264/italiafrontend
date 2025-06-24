@@ -108,18 +108,18 @@ export default function Rawbt3Inch({
       hour12: true,
     });
 
-  const invoiceText = `
-\x1B\x61\x01\x1D\x21\x33Italia Pizza\x1D\x21\x00
+  const itemTotal = calculateTotalPrice(productsToSend);
+  const gstAmount = +(itemTotal * 0.05).toFixed(2);
 
+  const invoiceText = `
+\x1B\x61\x01\x1D\x21\x33Pizza Italia\x1D\x21\x00
 \x1B\x61\x01\x1B\x21\x20 OPP. BAJAJ BIKE AGENCY\x1B\x21\x00
 \x1B\x61\x01\x1B\x21\x20KAITHAL ROAD PEHOWA\x1B\x21\x00
 \x1B\x61\x01\x1B\x21\x20   +91 72220-06000\x1B\x21\x00         
 \x1B\x61\x01\x1B\x21\x20    +91 99922-71872\x1B\x21\x00\x1B\x61\x00             
-
   \x1B\x21\x30---Invoice Details---\x1B\x21\x00
-
   \x1B\x21\x20${formattedDate} ${formattedTime}\x1B\x21\x00
-  
+
 \x1B\x21\x20 Bill No: #${Math.floor(1000 + Math.random() * 9000)}\x1B\x21\x00
 ${
   [customerName, customerPhone, customerAddress]
@@ -133,7 +133,8 @@ ${
 }
   ${detailedItems}
   ${[
-  hasDeliveryCharge ? `Item Total:                             ${totalprice} ` : "",
+  `Item Total:                             ${totalprice} `,
+  `  GST (5%):                               ${gstAmount} `,
   hasDeliveryCharge ? `  Delivery Charge:                       +${delivery}` : "",
   parsedDiscount > 0
     ? `  Discount:                              -${DiscountAmount}\n${dash}`
@@ -143,11 +144,10 @@ ${
   .join("\n")}
 
 \x1B\x21\x30\x1B\x34    Total: Rs ${
-      calculateTotalPrice(productsToSend) + deliveryChargeAmount - parsedDiscount
+      calculateTotalPrice(productsToSend) + gstAmount + deliveryChargeAmount - parsedDiscount
     }/-  \x1B\x21\x00\x1B\x35
 
           Thank You Visit Again!\n${dash}
-  
              Powered by BillZo
        
   `;

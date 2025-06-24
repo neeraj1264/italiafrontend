@@ -14,10 +14,13 @@ export default function WhatsAppButton({
   const calculateTotalPrice = (items = []) =>
     items.reduce((sum, p) => sum + p.price * (p.quantity || 1), 0);
 
+    const itemTotal = calculateTotalPrice(productsToSend);
+    const gstAmount = +(itemTotal * 0.05).toFixed(2);
+
   const handleSendToWhatsApp = () => {
     // Compute current total
     const currentTotal =
-      calculateTotalPrice(productsToSend) +
+      calculateTotalPrice(productsToSend) + gstAmount +
       deliveryChargeAmount -
       parsedDiscount;
 
@@ -45,19 +48,20 @@ export default function WhatsAppButton({
 
     // Construct message
     const message = encodeURIComponent(
-      `*🍔🍟🍕 Italia Pizza 🍕🍟🍔*\n\n` +
+      `*🍔🍟🍕 Pizza Italia 🍕🍟🍔*\n\n` +
         `Order: *${orderId}*` +
         (customerName ? `\nName: *${customerName}*` : "") +
         (customerPhone ? `\nPhone: *${customerPhone}*` : "") +
         (customerAddress ? `\nAddress: *${customerAddress}*` : "") +
         `\nAmount: *₹${currentTotal}*` +
         `\n\n----------item----------\n${productDetails}` +
+        `\n\n GST (5%) =  ₹${gstAmount}` +
         (serviceText ? `\n${serviceText}` : "") +
         (discountText ? `\n${discountText}` : "")
     );
 
     // Format number for WhatsApp
-    const formattedPhone = `+91${customerPhone}`;
+    const formattedPhone = `${customerPhone}`;
     const waUrl = `https://wa.me/${formattedPhone}?text=${message}`;
     window.open(waUrl, "_blank");
   };

@@ -321,6 +321,11 @@ const CustomerDetail = () => {
     // }
   };
 
+  const itemTotal = calculateTotalPrice(productsToSend);
+  const gstAmount = +(itemTotal * 0.05).toFixed(2);
+  const netTotal =
+    itemTotal + gstAmount + deliveryChargeAmount - parsedDiscount;
+
   return (
     <div>
       <ToastContainer />
@@ -438,7 +443,7 @@ const CustomerDetail = () => {
       >
         {/* <img src="/logo.png" alt="Logo" width={100} className="logo" /> */}
         <h1 style={{ textAlign: "center", margin: 0, fontSize: "25px" }}>
-          Italia Pizza
+          Pizza Italia
         </h1>
         <p style={{ textAlign: "center", margin: 0, fontSize: "15px" }}>
           Opp. Bajaj Bike Agency
@@ -447,7 +452,7 @@ const CustomerDetail = () => {
           Kaithal Road Pehowa
         </p>
         <p style={{ textAlign: "center", margin: 0, fontSize: "15px" }}>
-          99922-71872    72220-06000
+          99922-71872 72220-06000
         </p>
         <hr />
         <h2 style={{ textAlign: "center", margin: 0, fontSize: "20px" }}>
@@ -496,11 +501,22 @@ const CustomerDetail = () => {
             </p>
           )}
         </div>
-        <table>
+        <table
+          style={{
+            width: "100%",
+            tableLayout: "fixed", // allow us to control column widths
+          }}
+        >
+          <colgroup>
+            <col style={{ width: "50%" }} /> {/* product name */}
+            <col style={{ width: "15%" }} /> {/* qty */}
+            <col style={{ width: "15%" }} /> {/* price */}
+            <col style={{ width: "20%" }} /> {/* total */}
+          </colgroup>
           <thead>
             <tr className="productname">
               <th>Product Name</th>
-              <th>Quantity</th>
+              <th>Qty</th>
               <th>Price</th>
               <th>Total</th>
             </tr>
@@ -515,11 +531,23 @@ const CustomerDetail = () => {
                 </td>
                 <td style={{ textAlign: "Center" }}>{product.quantity || 1}</td>
                 <td style={{ textAlign: "Center" }}>₹{product.price}</td>
-                <td style={{ textAlign: "right" }}>
+                <td style={{ textAlign: "center" }}>
                   ₹{product.price * (product.quantity || 1)}
                 </td>
               </tr>
             ))}
+          </tbody>
+          <tfoot>
+            <tr className="productdetail">
+              {/* span first three cols to label “Service Charge” */}
+              <td
+                colSpan={3}
+                style={{ textAlign: "right", fontStyle: "italic" }}
+              >
+                GST (5%)
+              </td>
+              <td style={{ textAlign: "center" }}>+₹{gstAmount}</td>
+            </tr>
             {deliveryChargeAmount > 0 && (
               <tr className="productdetail">
                 {/* span first three cols to label “Service Charge” */}
@@ -546,19 +574,9 @@ const CustomerDetail = () => {
                 <td style={{ textAlign: "center" }}>-₹{parsedDiscount}</td>
               </tr>
             )}
-          </tbody>
+          </tfoot>
         </table>
-        <p className="totalAmount">
-          Net Total: ₹
-          {(
-            productsToSend.reduce(
-              (sum, p) => sum + p.price * (p.quantity || 1),
-              0
-            ) +
-            deliveryChargeAmount -
-            parsedDiscount
-          ).toFixed(2)}
-        </p>
+        <p className="totalAmount">Net Total: ₹{netTotal.toFixed(2)}</p>
       </div>
       {/* mobile print content */}
       <div
