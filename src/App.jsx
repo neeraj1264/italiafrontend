@@ -86,7 +86,7 @@ const App = () => {
 
   return (
       <Router>
-        {/* {!isLoggedIn ? (
+        {!isLoggedIn ? (
           <Routes>
             <Route
               path="*"
@@ -101,7 +101,7 @@ const App = () => {
               }
             />
           </Routes>
-        ) : ( */}
+        ) : (
           <>
             <Routes>
               <Route path="/" element={<Navigate to="/invoice" />} />
@@ -117,7 +117,7 @@ const App = () => {
               <Route path="/report" element={<OrderReport />} />
             </Routes>
           </>
-        
+        )}
       </Router>
         );
 };
