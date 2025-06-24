@@ -14,7 +14,7 @@ import NewProduct from "./components/ProductAdded/NewProduct";
 import History from "./components/history/History";
 import { CustomerData } from "./components/data/CustomerData";
 import Advance from "./components/advance/Advance";
-import Login from "./components/login/Login";
+import Login from "./components/login/Login"; 
 import OrderReport from "./OrderReport";
 
 const App = () => {
