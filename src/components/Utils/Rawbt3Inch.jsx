@@ -120,15 +120,28 @@ export default function Rawbt3Inch({
 
   \x1B\x21\x20${formattedDate} ${formattedTime}\x1B\x21\x00
   
-  \x1B\x21\x20Bill No: #${Math.floor(1000 + Math.random() * 9000)}\x1B\x21\x00
-  ${customerName ? `\x1B\x21\x20Name   : ${customerName}\x1B\x21\x00` : ""}
-  ${customerPhone ? `\x1B\x21\x20Phone  : ${customerPhone}\x1B\x21\x00` : ""}
-  ${customerAddress ? `\x1B\x21\x20Address: ${customerAddress}\x1B\x21\x00` : ""}
-
+\x1B\x21\x20 Bill No: #${Math.floor(1000 + Math.random() * 9000)}\x1B\x21\x00
+${
+  [customerName, customerPhone, customerAddress]
+    .map((value, index) => {
+      if (!value) return "";
+      const label = ["Name   :", "Phone  :", "Address:"][index];
+      return `\x1B\x21\x20 ${label} ${value}\x1B\x21\x00`;
+    })
+    .filter(Boolean)
+    .join("\n")
+}
   ${detailedItems}
-  ${hasDeliveryCharge ? `Item Total:                             ${totalprice} ` : " "}
-  ${hasDeliveryCharge ? `Delivery Charge:                       +${delivery}` : " "}
-  ${parsedDiscount ? `Discount:                              -${DiscountAmount}\n${dash}` : " "}
+  ${[
+  hasDeliveryCharge ? `Item Total:                             ${totalprice} ` : "",
+  hasDeliveryCharge ? `  Delivery Charge:                       +${delivery}` : "",
+  parsedDiscount > 0
+    ? `  Discount:                              -${DiscountAmount}\n${dash}`
+    : ""
+]
+  .filter(Boolean)
+  .join("\n")}
+
 \x1B\x21\x30\x1B\x34    Total: Rs ${
       calculateTotalPrice(productsToSend) + deliveryChargeAmount - parsedDiscount
     }/-  \x1B\x21\x00\x1B\x35
