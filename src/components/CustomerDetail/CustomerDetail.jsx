@@ -11,6 +11,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import WhatsAppButton from "../Utils/WhatsappOrder";
 import RawBTPrintButton from "../Utils/RawBTPrintButton";
+import Rawbt3Inch from "../Utils/Rawbt3Inch";
 
 const toastOptions = {
   position: "bottom-right",
@@ -721,15 +722,15 @@ console.log("🔶 JSON payload:", JSON.stringify(order));
             <button onClick={handlePngDownload} className="popupButton">
               Download Invoice
             </button>
-            <RawBTPrintButton
+            <Rawbt3Inch
               productsToSend={productsToSend}
               parsedDiscount={parsedDiscount}
               deliveryChargeAmount={parseFloat(deliveryCharge) || 0}
               customerPhone={customerPhone}
             />
-            <button onClick={MobilePrint} className="popupButton">
+            {/* <button onClick={MobilePrint} className="popupButton">
               Usb Print
-            </button>
+            </button> */}
 
             <button onClick={handleClosePopup} className="popupCloseButton">
               Cancel

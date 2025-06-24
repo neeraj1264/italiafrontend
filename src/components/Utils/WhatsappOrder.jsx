@@ -1,15 +1,5 @@
 import React from "react";
 
-/**
- * Props expected:
- * - productsToSend: Array of { name, price, quantity, size }
- * - deliveryChargeAmount: number
- * - deliveryCharge: string or number
- * - parsedDiscount: number
- * - customerPhone: string
- * - customerAddress: string
- * - restaurantName: string
- */
 export default function WhatsAppButton({
   productsToSend,
   deliveryChargeAmount,

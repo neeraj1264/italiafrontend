@@ -28,7 +28,9 @@ const App = () => {
   const [baseUrl, setBaseUrl] = useState(""); // Dynamic BASE_URL
 
   const currentRoute = window.location.pathname;
+  const USERS = JSON.parse(import.meta.env.VITE_USERS || "[]");
 
+  console.log("getting data from env fie " , USERS)
   // Clear 'productsToSend' from localStorage on page reload
   useEffect(() => {
     // Check if the user is already logged in
