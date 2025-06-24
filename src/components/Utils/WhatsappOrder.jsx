@@ -6,6 +6,7 @@ export default function WhatsAppButton({
   deliveryCharge,
   parsedDiscount,
   customerPhone,
+  customerName,
   customerAddress,
   restaurantName,
 }) {
@@ -25,7 +26,7 @@ export default function WhatsAppButton({
       .map((product, i) => {
         const qty = product.quantity || 1;
         const sizeLabel = product.size ? ` ${product.size}` : "";
-        return `${i + 1}. ${qty} x ${product.name}${sizeLabel} = ₹${
+        return `${i+1}. ${qty} x ${product.name}${sizeLabel} = ₹${
           product.price * qty
         }`;
       })
@@ -44,8 +45,9 @@ export default function WhatsAppButton({
 
     // Construct message
     const message = encodeURIComponent(
-      `*🍔🍟🍕 ${restaurantName} 🍕🍟🍔*\n\n` +
+      `*🍔🍟🍕 Italia Pizza 🍕🍟🍔*\n\n` +
         `Order: *${orderId}*` +
+        (customerName ? `\nName: *${customerName}*` : "") +
         (customerPhone ? `\nPhone: *${customerPhone}*` : "") +
         (customerAddress ? `\nAddress: *${customerAddress}*` : "") +
         `\nAmount: *₹${currentTotal}*` +
@@ -53,11 +55,6 @@ export default function WhatsAppButton({
         (serviceText ? `\n${serviceText}` : "") +
         (discountText ? `\n${discountText}` : "")
     );
-
-    if (!customerPhone) {
-      alert("Customer phone is required to send message.");
-      return;
-    }
 
     // Format number for WhatsApp
     const formattedPhone = `+91${customerPhone}`;

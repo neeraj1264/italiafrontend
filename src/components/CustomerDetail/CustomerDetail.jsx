@@ -181,7 +181,7 @@ const CustomerDetail = () => {
 
     try {
       console.log("🔶 Final order object:", order);
-console.log("🔶 JSON payload:", JSON.stringify(order));
+      console.log("🔶 JSON payload:", JSON.stringify(order));
 
       // Send the order to your backend to be saved in MongoDB
       const data = await sendorder(order);
@@ -228,80 +228,80 @@ console.log("🔶 JSON payload:", JSON.stringify(order));
     }, 10);
   };
 
-  const MobilePrint = async () => {
-    try {
-      const kotContent = document.getElementById("mobileinvoice").innerHTML;
+  // const UsbPrint = async () => {
+  //   try {
+  //     const kotContent = document.getElementById("mobileinvoice").innerHTML;
 
-      const newWindow = window.open("", "", "width=600,height=400");
-      newWindow.document.write(`
-        <html>
-          <head>
-            <title>KOT</title>
-            <style>
-              body {
-                font-family: Arial, sans-serif;
-                font-size: 12px;
-                margin: 3rem 0;
-                padding: 0;
-                width: 48mm;
-              }
-              table {
-                width: 94%;
-                border-collapse: collapse;
-              }
-              th, td {
-                border: 2px solid black;
-                padding: 2px;
-                text-align: left;
-                font-size: 10px;
-                font-weight: bold;
-              }
-              .total {
-                font-size: 13px;
-                text-align: left;
-                margin-top: 4px;
-                display: flex;
-                justify-content: space-between;
-              }
-              .totalAmount {
-                font-size: 15px;
-                font-weight: 800;
-                border: 2px dashed;
-                text-align: center;
-                background: black;
-                color: white;
-                padding: 0.4rem;
-              }
-              .logo {
-                display: flex;
-                margin: auto;
-              }
-              .logo img {
-                width: 40px;
-                height: auto;
-              }
-              hr {
-                border: 2px dashed;
-              }
-            </style>
-          </head>
-          <body>
-            ${kotContent}
-          </body>
-        </html>
-      `);
+  //     const newWindow = window.open("", "", "width=600,height=400");
+  //     newWindow.document.write(`
+  //       <html>
+  //         <head>
+  //           <title>KOT</title>
+  //           <style>
+  //             body {
+  //               font-family: Arial, sans-serif;
+  //               font-size: 12px;
+  //               margin: 3rem 0;
+  //               padding: 0;
+  //               width: 48mm;
+  //             }
+  //             table {
+  //               width: 94%;
+  //               border-collapse: collapse;
+  //             }
+  //             th, td {
+  //               border: 2px solid black;
+  //               padding: 2px;
+  //               text-align: left;
+  //               font-size: 10px;
+  //               font-weight: bold;
+  //             }
+  //             .total {
+  //               font-size: 13px;
+  //               text-align: left;
+  //               margin-top: 4px;
+  //               display: flex;
+  //               justify-content: space-between;
+  //             }
+  //             .totalAmount {
+  //               font-size: 15px;
+  //               font-weight: 800;
+  //               border: 2px dashed;
+  //               text-align: center;
+  //               background: black;
+  //               color: white;
+  //               padding: 0.4rem;
+  //             }
+  //             .logo {
+  //               display: flex;
+  //               margin: auto;
+  //             }
+  //             .logo img {
+  //               width: 40px;
+  //               height: auto;
+  //             }
+  //             hr {
+  //               border: 2px dashed;
+  //             }
+  //           </style>
+  //         </head>
+  //         <body>
+  //           ${kotContent}
+  //         </body>
+  //       </html>
+  //     `);
 
-      newWindow.document.close();
+  //     newWindow.document.close();
 
-      newWindow.onload = () => {
-        newWindow.focus();
-        newWindow.print();
-        newWindow.close();
-      };
-    } catch (error) {
-      console.error("Error generating printable content:", error);
-    }
-  };
+  //     newWindow.onload = () => {
+  //       newWindow.focus();
+  //       newWindow.print();
+  //       newWindow.close();
+  //     };
+  //   } catch (error) {
+  //     console.error("Error generating printable content:", error);
+  //   }
+  // };
 
   // Helper function to calculate total price
   const calculateTotalPrice = (products = []) => {
@@ -433,18 +433,21 @@ console.log("🔶 JSON payload:", JSON.stringify(order));
       <div
         className="invoice-content"
         id="invoice"
-        // ref={invoiceRef}
+        ref={invoiceRef}
         style={{ display: "none" }}
       >
-        <img src="/logo.png" alt="Logo" width={100} className="logo" />
+        {/* <img src="/logo.png" alt="Logo" width={100} className="logo" /> */}
         <h1 style={{ textAlign: "center", margin: 0, fontSize: "25px" }}>
-          Urban Pizzeria
+          Italia Pizza
         </h1>
         <p style={{ textAlign: "center", margin: 0, fontSize: "15px" }}>
-          Pehowa, Haryana, 136128
+          Opp. Bajaj Bike Agency
         </p>
         <p style={{ textAlign: "center", margin: 0, fontSize: "15px" }}>
-          Phone Number - +91 81689-01827
+          Kaithal Road Pehowa
+        </p>
+        <p style={{ textAlign: "center", margin: 0, fontSize: "15px" }}>
+          99922-71872    72220-06000
         </p>
         <hr />
         <h2 style={{ textAlign: "center", margin: 0, fontSize: "20px" }}>
@@ -460,7 +463,7 @@ console.log("🔶 JSON payload:", JSON.stringify(order));
           </p>
           <p style={{ fontSize: "15px" }}>
             Created
-            On&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            On&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             {new Date().toLocaleDateString("en-GB", {
               day: "2-digit",
               month: "2-digit",
@@ -474,19 +477,24 @@ console.log("🔶 JSON payload:", JSON.stringify(order));
                 hour12: true, // Enables 12-hour format
               })}
           </p>
-
-          <p style={{ fontSize: "15px" }}>
-            Customer Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          </p>
-          <p style={{ fontSize: "15px" }}>
-            Phone Number &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -
-            &nbsp;&nbsp;&nbsp;&nbsp;{customerPhone ? customerPhone : "...."}
-          </p>
-          <p style={{ fontSize: "15px" }}>
-            Address&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            {customerAddress ? customerAddress : "...."}
-          </p>
+          {customerName && (
+            <p style={{ fontSize: "15px" }}>
+              Customer Name &nbsp;&nbsp;- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              {customerName}
+            </p>
+          )}
+          {customerPhone && (
+            <p style={{ fontSize: "15px" }}>
+              Phone Number &nbsp;&nbsp;&nbsp; - &nbsp;&nbsp;&nbsp;&nbsp;
+              {customerPhone}
+            </p>
+          )}
+          {customerAddress && (
+            <p style={{ fontSize: "15px" }}>
+              Address&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              {customerAddress}
+            </p>
+          )}
         </div>
         <table>
           <thead>
@@ -507,46 +515,56 @@ console.log("🔶 JSON payload:", JSON.stringify(order));
                 </td>
                 <td style={{ textAlign: "Center" }}>{product.quantity || 1}</td>
                 <td style={{ textAlign: "Center" }}>₹{product.price}</td>
-                <td style={{ textAlign: "Center" }}>
+                <td style={{ textAlign: "right" }}>
                   ₹{product.price * (product.quantity || 1)}
                 </td>
               </tr>
             ))}
+            {deliveryChargeAmount > 0 && (
+              <tr className="productdetail">
+                {/* span first three cols to label “Service Charge” */}
+                <td
+                  colSpan={3}
+                  style={{ textAlign: "right", fontStyle: "italic" }}
+                >
+                  Service Charge
+                </td>
+                <td style={{ textAlign: "center" }}>
+                  +₹{deliveryChargeAmount}
+                </td>
+              </tr>
+            )}
+
+            {parsedDiscount > 0 && (
+              <tr className="productdetail">
+                <td
+                  colSpan={3}
+                  style={{ textAlign: "right", fontStyle: "italic" }}
+                >
+                  Discount
+                </td>
+                <td style={{ textAlign: "center" }}>-₹{parsedDiscount}</td>
+              </tr>
+            )}
           </tbody>
         </table>
-        <div className="total">
-          {/* <p>
-            Item Total:{" "}
-            <span>
-              ₹
-              {productsToSend
-                .reduce(
-                  (sum, product) =>
-                    sum + product.price * (product.quantity || 1),
-                  0
-                )
-                .toFixed(2)}
-            </span>
-          </p> */}
-          {/* <p>
-            Service Charge: <span>₹20.00</span>
-          </p> */}
-        </div>
         <p className="totalAmount">
-          NetTotal: ₹
-          {productsToSend
-            .reduce(
-              (sum, product) => sum + product.price * (product.quantity || 1),
+          Net Total: ₹
+          {(
+            productsToSend.reduce(
+              (sum, p) => sum + p.price * (p.quantity || 1),
               0
-            )
-            .toFixed(2)}
-        </p>{" "}
+            ) +
+            deliveryChargeAmount -
+            parsedDiscount
+          ).toFixed(2)}
+        </p>
       </div>
       {/* mobile print content */}
       <div
         className="invoice-content"
         id="mobileinvoice"
-        ref={invoiceRef}
+        // ref={invoiceRef}
         style={{ display: "none" }}
       >
         <img src="/logo.png" alt="Logo" width={100} className="logo" />
@@ -716,6 +734,7 @@ console.log("🔶 JSON payload:", JSON.stringify(order));
               deliveryCharge={deliveryCharge}
               parsedDiscount={parsedDiscount}
               customerPhone={customerPhone}
+              customerName={customerName}
               customerAddress={customerAddress}
               restaurantName={RestorentName}
             />
@@ -727,8 +746,10 @@ console.log("🔶 JSON payload:", JSON.stringify(order));
               parsedDiscount={parsedDiscount}
               deliveryChargeAmount={parseFloat(deliveryCharge) || 0}
               customerPhone={customerPhone}
+              customerName={customerName}
+              customerAddress={customerAddress}
             />
-            {/* <button onClick={MobilePrint} className="popupButton">
+            {/* <button onClick={UsbPrint} className="popupButton">
               Usb Print
             </button> */}
 

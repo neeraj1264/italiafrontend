@@ -6,6 +6,8 @@ export default function Rawbt3Inch({
   parsedDiscount,
   deliveryChargeAmount,
   customerPhone,
+  customerName,
+  customerAddress,
  icon: Icon,
   timestamp,
 }){
@@ -107,18 +109,22 @@ export default function Rawbt3Inch({
     });
 
   const invoiceText = `
-\x1B\x61\x01\x1B\x21\x30Italia Pizza\x1B\x21\x00
+\x1B\x61\x01\x1D\x21\x33Italia Pizza\x1D\x21\x00
+
 \x1B\x61\x01\x1B\x21\x20 OPP. BAJAJ BIKE AGENCY\x1B\x21\x00
-\x1B\x61\x01\x1B\x21\x20 KAITHAL ROAD PEHOWA\x1B\x21\x00
-\x1B\x61\x01\x1B\x21\x20 +91 72220-06000\x1B\x21\x00         
-\x1B\x61\x01\x1B\x21\x20 +91 99922-71872\x1B\x21\x00\x1B\x61\x00             
+\x1B\x61\x01\x1B\x21\x20KAITHAL ROAD PEHOWA\x1B\x21\x00
+\x1B\x61\x01\x1B\x21\x20   +91 72220-06000\x1B\x21\x00         
+\x1B\x61\x01\x1B\x21\x20    +91 99922-71872\x1B\x21\x00\x1B\x61\x00             
 
   \x1B\x21\x30---Invoice Details---\x1B\x21\x00
 
   \x1B\x21\x20${formattedDate} ${formattedTime}\x1B\x21\x00
   
   \x1B\x21\x20Bill No: #${Math.floor(1000 + Math.random() * 9000)}\x1B\x21\x00
-  \x1B\x21\x20Phone: ${customerPhone || "N/A"}\x1B\x21\x00
+  ${customerName ? `\x1B\x21\x20Name   : ${customerName}\x1B\x21\x00` : ""}
+  ${customerPhone ? `\x1B\x21\x20Phone  : ${customerPhone}\x1B\x21\x00` : ""}
+  ${customerAddress ? `\x1B\x21\x20Address: ${customerAddress}\x1B\x21\x00` : ""}
+
   ${detailedItems}
   ${hasDeliveryCharge ? `Item Total:                             ${totalprice} ` : " "}
   ${hasDeliveryCharge ? `Delivery Charge:                       +${delivery}` : " "}

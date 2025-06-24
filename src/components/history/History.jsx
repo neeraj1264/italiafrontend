@@ -32,37 +32,38 @@ const History = () => {
     clearTimeout(pressTimer);
   };
 
-const handleRemoveOrder = async (orderId) => {
-  try {
-    const advanceFeatured = localStorage.getItem("advancedFeature") === "true";
+  const handleRemoveOrder = async (orderId) => {
+    try {
+      const advanceFeatured =
+        localStorage.getItem("advancedFeature") === "true";
 
-    if (!advanceFeatured) {
-      // not enabled → show “feature not granted” message
-      setModalMessage("Advance feature not granted.");
-      setIsModalOpen(true);
-      return;
+      if (!advanceFeatured) {
+        // not enabled → show “feature not granted” message
+        setModalMessage("Advance feature not granted.");
+        setIsModalOpen(true);
+        return;
+      }
+
+      // advanced feature is enabled → ask for confirmation
+      const confirmDelete = window.confirm(
+        "This will permanently delete the order. Are you sure?"
+      );
+      if (!confirmDelete) return; // user cancelled
+
+      // user confirmed → proceed with deletion
+      await removeOrder(orderId);
+
+      // update local state
+      const updatedOrders = orders.filter((o) => o.id !== orderId);
+      setOrders(updatedOrders);
+      setFilteredOrders((prev) => prev.filter((o) => o.id !== orderId));
+
+      console.log("Order removed successfully from both MongoDB and state");
+    } catch (error) {
+      console.error("Error removing order:", error.message);
+      // you could also show a toast / modal here
     }
-
-    // advanced feature is enabled → ask for confirmation
-    const confirmDelete = window.confirm(
-      "This will permanently delete the order. Are you sure?"
-    );
-    if (!confirmDelete) return; // user cancelled
-
-    // user confirmed → proceed with deletion
-    await removeOrder(orderId);
-
-    // update local state
-    const updatedOrders = orders.filter((o) => o.id !== orderId);
-    setOrders(updatedOrders);
-    setFilteredOrders((prev) => prev.filter((o) => o.id !== orderId));
-
-    console.log("Order removed successfully from both MongoDB and state");
-  } catch (error) {
-    console.error("Error removing order:", error.message);
-    // you could also show a toast / modal here
-  }
-};
+  };
 
   useEffect(() => {
     const getOrders = async () => {
@@ -297,9 +298,15 @@ const handleRemoveOrder = async (orderId) => {
                               ? `${product.name} (${product.size})`
                               : product.name}
                           </td>
-                          <td style={{textAlign: "right"}}>{product.price}</td>
-                          <td style={{textAlign: "center"}}>{product.quantity}</td>
-                          <td style={{textAlign: "right"}}>{product.price * product.quantity}</td>
+                          <td style={{ textAlign: "right" }}>
+                            {product.price}
+                          </td>
+                          <td style={{ textAlign: "center" }}>
+                            {product.quantity}
+                          </td>
+                          <td style={{ textAlign: "right" }}>
+                            {product.price * product.quantity}
+                          </td>
                         </tr>
                       ))}
 
@@ -311,7 +318,7 @@ const handleRemoveOrder = async (orderId) => {
                           </td>
                           <td></td>
                           <td></td>
-                          <td style={{textAlign: "right"}}>
+                          <td style={{ textAlign: "right" }}>
                             <strong>+{order.delivery}</strong>
                           </td>
                         </tr>
@@ -325,7 +332,7 @@ const handleRemoveOrder = async (orderId) => {
                           </td>
                           <td></td>
                           <td></td>
-                          <td style={{textAlign: "right"}}>
+                          <td style={{ textAlign: "right" }}>
                             <strong>-{order.discount}</strong>
                           </td>
                         </tr>
@@ -358,9 +365,11 @@ const handleRemoveOrder = async (orderId) => {
                               />
                             )}
                           /> */}
-                            <Rawbt3Inch
+                          <Rawbt3Inch
                             productsToSend={order.products}
                             customerPhone={order.phone}
+                            customerName={order.name}
+                            customerAddress={order.address}
                             deliveryChargeAmount={order.delivery}
                             parsedDiscount={order.discount}
                             timestamp={order.timestamp}
@@ -370,7 +379,7 @@ const handleRemoveOrder = async (orderId) => {
                                 style={{
                                   color: "#1abc9c",
                                   transition: "transform 0.1s ease",
-                                  textAlign: "center"
+                                  textAlign: "center",
                                 }}
                                 onMouseEnter={(e) =>
                                   (e.currentTarget.style.transform =
