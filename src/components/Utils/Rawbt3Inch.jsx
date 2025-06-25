@@ -93,7 +93,7 @@ export default function Rawbt3Inch({
     );
     const delivery = `${deliveryChargeAmount}`.padStart(priceWidth, " ");
     // Combine header, separator, and product details
-    const detailedItems = `\n${dash}\n${header}\n${dash}\n${productDetails}\n${dash}`;
+    const detailedItems = `${dash}\n${header}\n${dash}\n${productDetails}\n${dash}`;
 
     const date = timestamp ? new Date(timestamp) : new Date();
     const formattedDate = date.toLocaleDateString("en-GB", {
@@ -113,13 +113,12 @@ export default function Rawbt3Inch({
 
   const invoiceText = `
 \x1B\x61\x01\x1D\x21\x33Pizza Italia\x1D\x21\x00
-\x1B\x61\x01\x1B\x21\x20 OPP. BAJAJ BIKE AGENCY\x1B\x21\x00
-\x1B\x61\x01\x1B\x21\x20KAITHAL ROAD PEHOWA\x1B\x21\x00
-\x1B\x61\x01\x1B\x21\x20   +91 72220-06000\x1B\x21\x00         
-\x1B\x61\x01\x1B\x21\x20    +91 99922-71872\x1B\x21\x00\x1B\x61\x00             
+\x1B\x61\x01\x1D\x21\x10OPP. BAJAJ BIKE AGENCY\x1B\x21\x00
+\x1B\x61\x01\x1D\x21\x10KAITHAL ROAD PEHOWA\x1B\x21\x00
+\x1B\x61\x01\x1D\x21\x10 7222006000 9992271872\x1B\x21\x00    
+\x1B\x61\x01\x1D\x21\x10 GstNo:06QTIPS7467A1Z1\x1B\x21\x00\x1B\x61\x00
   \x1B\x21\x30---Invoice Details---\x1B\x21\x00
   \x1B\x21\x20${formattedDate} ${formattedTime}\x1B\x21\x00
-
 \x1B\x21\x20 Bill No: #${Math.floor(1000 + Math.random() * 9000)}\x1B\x21\x00
 ${
   [customerName, customerPhone, customerAddress]
@@ -131,10 +130,10 @@ ${
     .filter(Boolean)
     .join("\n")
 }
-  ${detailedItems}
+${detailedItems}
   ${[
   `Item Total:                             ${totalprice} `,
-  `  GST (5%):                               ${gstAmount} `,
+  `  GST (5%):                              +${gstAmount} `,
   hasDeliveryCharge ? `  Delivery Charge:                       +${delivery}` : "",
   parsedDiscount > 0
     ? `  Discount:                              -${DiscountAmount}\n${dash}`
@@ -143,9 +142,9 @@ ${
   .filter(Boolean)
   .join("\n")}
 
-\x1B\x21\x30\x1B\x34    Total: Rs ${
+\x1B\x21\x30    Total: Rs${
       calculateTotalPrice(productsToSend) + gstAmount + deliveryChargeAmount - parsedDiscount
-    }/-  \x1B\x21\x00\x1B\x35
+    }/-  \x1B\x21\x00
 
           Thank You Visit Again!\n${dash}
              Powered by BillZo

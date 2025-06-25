@@ -442,7 +442,7 @@ const CustomerDetail = () => {
         style={{ display: "none" }}
       >
         {/* <img src="/logo.png" alt="Logo" width={100} className="logo" /> */}
-        <h1 style={{ textAlign: "center", margin: 0, fontSize: "25px" }}>
+        <h1 style={{ textAlign: "center", margin: 0, fontSize: "55px" }}>
           Pizza Italia
         </h1>
         <p style={{ textAlign: "center", margin: 0, fontSize: "15px" }}>
@@ -452,7 +452,10 @@ const CustomerDetail = () => {
           Kaithal Road Pehowa
         </p>
         <p style={{ textAlign: "center", margin: 0, fontSize: "15px" }}>
-          99922-71872 72220-06000
+          99922-71872   72220-06000
+        </p>
+        <p style={{ textAlign: "center", margin: 0, fontSize: "15px" }}>
+          Gst No: 06QTIPS7467A1Z1
         </p>
         <hr />
         <h2 style={{ textAlign: "center", margin: 0, fontSize: "20px" }}>
