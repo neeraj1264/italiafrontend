@@ -161,6 +161,7 @@ const CustomerDetail = () => {
       timestamp: new Date().toISOString(),
       discount: parsedDiscount, // save discount
       delivery: parseFloat(deliveryCharge) || 0,
+      includeGST,
     };
     console.log(order);
     const customerDataObject = {

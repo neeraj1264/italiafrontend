@@ -373,6 +373,7 @@ const History = () => {
                             deliveryChargeAmount={order.delivery}
                             parsedDiscount={order.discount}
                             timestamp={order.timestamp}
+                            includeGST={order.includeGST}
                             icon={() => (
                               <FaPrint
                                 size={32}
