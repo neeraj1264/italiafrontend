@@ -8,19 +8,19 @@ export default function WhatsAppButton({
   customerPhone,
   customerName,
   customerAddress,
-  restaurantName,
+  includeGST = true,
 }) {
   // Helper to calculate total price of items
   const calculateTotalPrice = (items = []) =>
     items.reduce((sum, p) => sum + p.price * (p.quantity || 1), 0);
 
     const itemTotal = calculateTotalPrice(productsToSend);
-    const gstAmount = +(itemTotal * 0.05).toFixed(2);
+    const gstAmount = includeGST ? +(itemTotal * 0.05).toFixed(2) : 0;
 
   const handleSendToWhatsApp = () => {
     // Compute current total
     const currentTotal =
-      calculateTotalPrice(productsToSend) + gstAmount +
+      calculateTotalPrice(productsToSend) + (includeGST ? gstAmount : 0) +
       deliveryChargeAmount -
       parsedDiscount;
 
@@ -47,19 +47,20 @@ export default function WhatsAppButton({
     const orderId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
 
     // Construct message
-    const message = encodeURIComponent(
+    let message = encodeURIComponent(
       `*🍔🍟🍕 Pizza Italia 🍕🍟🍔*\n\n` +
         `Order: *${orderId}*` +
         (customerName ? `\nName: *${customerName}*` : "") +
         (customerPhone ? `\nPhone: *${customerPhone}*` : "") +
         (customerAddress ? `\nAddress: *${customerAddress}*` : "") +
         `\nAmount: *₹${currentTotal}*` +
-        `\n\n----------item----------\n${productDetails}` +
-        `\n\n GST (5%) =  ₹${gstAmount}` +
+        `\n\n----------item----------\n${productDetails}\n` +
         (serviceText ? `\n${serviceText}` : "") +
         (discountText ? `\n${discountText}` : "")
     );
-
+  if (includeGST) {
+    message += `\n\nGST (5%): ₹${gstAmount}`;   // ← only if includeGST
+  }
     // Format number for WhatsApp
     const formattedPhone = `${customerPhone}`;
     const waUrl = `https://wa.me/${formattedPhone}?text=${message}`;

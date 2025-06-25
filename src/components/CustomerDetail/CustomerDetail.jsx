@@ -24,6 +24,7 @@ const CustomerDetail = () => {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
+  const [includeGST, setIncludeGST] = useState(true);
 
   const [deliveryCharge, setDeliveryCharge] = useState();
   const [discount, setDiscount] = useState(); // New discount state
@@ -322,7 +323,7 @@ const CustomerDetail = () => {
   };
 
   const itemTotal = calculateTotalPrice(productsToSend);
-  const gstAmount = +(itemTotal * 0.05).toFixed(2);
+  const gstAmount = includeGST ? +(itemTotal * 0.05).toFixed(2) : 0;
   const netTotal =
     itemTotal + gstAmount + deliveryChargeAmount - parsedDiscount;
 
@@ -541,16 +542,14 @@ const CustomerDetail = () => {
             ))}
           </tbody>
           <tfoot>
-            <tr className="productdetail">
-              {/* span first three cols to label “Service Charge” */}
-              <td
-                colSpan={3}
-                style={{ textAlign: "right", fontStyle: "italic" }}
-              >
-                GST (5%)
-              </td>
-              <td style={{ textAlign: "center" }}>+₹{gstAmount}</td>
-            </tr>
+           {includeGST && (
+          <tr className="productdetail">
+            <td colSpan={3} style={{ textAlign: "right", fontStyle: "italic" }}>
+              GST (5%)
+            </td>
+            <td style={{ textAlign: "center" }}>+₹{gstAmount}</td>
+          </tr>
+        )}
             {deliveryChargeAmount > 0 && (
               <tr className="productdetail">
                 {/* span first three cols to label “Service Charge” */}
@@ -749,6 +748,18 @@ const CustomerDetail = () => {
         <div className="popupOverlay">
           <div className="popupContent">
             <h2>Select Action</h2>
+
+             {/* GST toggle */}
+          <label style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+            <input
+              type="checkbox"
+              checked={includeGST}
+              onChange={e => setIncludeGST(e.target.checked)}
+              style={{ width: '20%' }}
+            />
+            Include 5% GST
+          </label>
+
             <WhatsAppButton
               productsToSend={productsToSend}
               deliveryChargeAmount={deliveryChargeAmount}
@@ -758,6 +769,7 @@ const CustomerDetail = () => {
               customerName={customerName}
               customerAddress={customerAddress}
               restaurantName={RestorentName}
+              includeGST={includeGST}
             />
             <button onClick={handlePngDownload} className="popupButton">
               Download Invoice
@@ -769,6 +781,7 @@ const CustomerDetail = () => {
               customerPhone={customerPhone}
               customerName={customerName}
               customerAddress={customerAddress}
+              includeGST={includeGST} 
             />
             {/* <button onClick={UsbPrint} className="popupButton">
               Usb Print

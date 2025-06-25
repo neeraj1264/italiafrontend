@@ -10,6 +10,7 @@ export default function Rawbt3Inch({
   customerAddress,
  icon: Icon,
   timestamp,
+  includeGST = true,
 }){
 
   // Helper to calculate total price
@@ -109,7 +110,7 @@ export default function Rawbt3Inch({
     });
 
   const itemTotal = calculateTotalPrice(productsToSend);
-  const gstAmount = +(itemTotal * 0.05).toFixed(2);
+  const gstAmount = includeGST ? +(itemTotal * 0.05).toFixed(2) : 0;
 
   const invoiceText = `
 \x1B\x61\x01\x1D\x21\x33Pizza Italia\x1D\x21\x00
@@ -133,7 +134,7 @@ ${
 ${detailedItems}
   ${[
   `Item Total:                             ${totalprice} `,
-  `  GST (5%):                              +${gstAmount} `,
+  includeGST && `  GST (5%):                               +${gstAmount} `,
   hasDeliveryCharge ? `  Delivery Charge:                       +${delivery}` : "",
   parsedDiscount > 0
     ? `  Discount:                              -${DiscountAmount}\n${dash}`
@@ -142,8 +143,8 @@ ${detailedItems}
   .filter(Boolean)
   .join("\n")}
 
-\x1B\x21\x30    Total: Rs${
-      calculateTotalPrice(productsToSend) + gstAmount + deliveryChargeAmount - parsedDiscount
+\x1B\x21\x30    Total: Rs ${
+      calculateTotalPrice(productsToSend) + (includeGST ? gstAmount : 0) + deliveryChargeAmount - parsedDiscount
     }/-  \x1B\x21\x00
 
           Thank You Visit Again!\n${dash}
