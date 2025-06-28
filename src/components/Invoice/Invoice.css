@@ -213,6 +213,15 @@
   font-size: 20px;
 }
 
+.quantity-btn {
+  /* margin-top: 1rem; */
+  font-weight: 800;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+}
+
 .icons {
   background: transparent;
   color: var(--bg);
@@ -223,6 +232,17 @@
   border: none;
 }
 
+.icon{
+  color: var(--bg);
+  background: transparent;
+  border: none;
+}
+.product-list{
+  padding: .5rem;
+}
+.quantity-btn span {
+  margin: 0 .4rem;
+}
 /* .done {
   position: fixed;
   bottom: 1rem;

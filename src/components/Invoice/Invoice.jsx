@@ -316,8 +316,6 @@ const Invoice = () => {
 
   // Navigate to the customer details page
   const handleDone = () => {
-    
-
     navigate("/customer-detail"); // Navigate to customer detail page
   };
 
@@ -498,7 +496,7 @@ const Invoice = () => {
         ) : (
           <div className="no-data">No data available</div>
         )}
-          {productsToSend.length > 0 ? (
+        {productsToSend.length > 0 ? (
           <div className="sample-section">
             <div className="check-container">
               <>
@@ -508,14 +506,11 @@ const Invoice = () => {
                     <div style={{ width: "10%" }}>
                       <span>No.</span>
                     </div>
-                    <div style={{ width: "50%", textAlign: "center" }}>
+                    <div style={{ width: "50%", textAlign: "left" }}>
                       <span>Name</span>
                     </div>
-                    <div style={{ width: "10%", textAlign: "center" }}>
+                    <div style={{ width: "17%", textAlign: "center" }}>
                       <span>Qty</span>
-                    </div>
-                    <div style={{ width: "7%", textAlign: "center" }}>
-                      <span>x</span>
                     </div>
                     <div style={{ width: "15%", textAlign: "right" }}>
                       <span>Price</span>
@@ -532,14 +527,40 @@ const Invoice = () => {
                       <div style={{ width: "10%" }}>
                         <span>{index + 1}.</span>
                       </div>
-                      <div style={{ width: "50%" }}>
+                      <div style={{ width: "45%" }}>
                         <span>{product.name}</span>
                       </div>
-                      <div style={{ width: "10%", textAlign: "center" }}>
-                        <span>{product.quantity}</span>
-                      </div>{" "}
-                      <div style={{ width: "7%", textAlign: "center" }}>
-                        <span>x</span>
+                      <div style={{ width: "25%", textAlign: "center" }}>
+                        <div className="quantity-btn">
+                          <button
+                            className="icon"
+                            onClick={() =>
+                              handleQuantityChange(
+                                product.name,
+                                product.price,
+                                -1
+                              )
+                            }
+                            // disabled={product.quantity <= 1}
+                          >
+                            <FaMinusCircle />
+                          </button>
+                          <span>
+                            {product.quantity}
+                          </span>
+                          <button
+                            className="icon"
+                            onClick={() =>
+                              handleQuantityChange(
+                                product.name,
+                                product.price,
+                                1
+                              )
+                            }
+                          >
+                            <FaPlusCircle />
+                          </button>
+                        </div>
                       </div>{" "}
                       <div style={{ width: "15%", textAlign: "right" }}>
                         <span>{product.price * product.quantity}</span>
@@ -579,8 +600,7 @@ const Invoice = () => {
                   </li>
                   {/* <div style={{ textAlign: "center" }}>{dash}</div> */}
                   <hr className="hr" />
-                  <hr className="hr" style={{marginBottom: "3rem"}}/>
-
+                  <hr className="hr" style={{ marginBottom: "3rem" }} />
                 </ul>
               </>
             </div>
@@ -591,15 +611,17 @@ const Invoice = () => {
       </div>
 
       <div className="invoice-btn">
-        <button onClick={()=>{navigate("/NewProduct")}} className="invoice-kot-btn">
+        <button
+          onClick={() => {
+            navigate("/NewProduct");
+          }}
+          className="invoice-kot-btn"
+        >
           <h2> + PRODUCT </h2>
         </button>
 
         <button onClick={handleDone} className="invoice-next-btn">
-          <h2 >
-            {" "}
-            NEXT ₹{calculateTotalPrice(productsToSend).toFixed(2)}
-          </h2>
+          <h2> NEXT ₹{calculateTotalPrice(productsToSend).toFixed(2)}</h2>
           {/* <FaArrowRight className="Invoice-arrow" /> */}
         </button>
       </div>
