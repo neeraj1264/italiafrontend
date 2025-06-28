@@ -498,6 +498,96 @@ const Invoice = () => {
         ) : (
           <div className="no-data">No data available</div>
         )}
+          {productsToSend.length > 0 ? (
+          <div className="sample-section">
+            <div className="check-container">
+              <>
+                <ul className="product-list" id="sample-section">
+                  <hr className="hr" />
+                  <li className="product-item" style={{ display: "flex" }}>
+                    <div style={{ width: "10%" }}>
+                      <span>No.</span>
+                    </div>
+                    <div style={{ width: "50%", textAlign: "center" }}>
+                      <span>Name</span>
+                    </div>
+                    <div style={{ width: "10%", textAlign: "center" }}>
+                      <span>Qty</span>
+                    </div>
+                    <div style={{ width: "7%", textAlign: "center" }}>
+                      <span>x</span>
+                    </div>
+                    <div style={{ width: "15%", textAlign: "right" }}>
+                      <span>Price</span>
+                    </div>
+                  </li>
+                  {/* <div style={{ textAlign: "center" }}>{dash}</div> */}
+                  <hr className="hr" />
+                  {productsToSend.map((product, index) => (
+                    <li
+                      key={index}
+                      className="product-item"
+                      style={{ display: "flex" }}
+                    >
+                      <div style={{ width: "10%" }}>
+                        <span>{index + 1}.</span>
+                      </div>
+                      <div style={{ width: "50%" }}>
+                        <span>{product.name}</span>
+                      </div>
+                      <div style={{ width: "10%", textAlign: "center" }}>
+                        <span>{product.quantity}</span>
+                      </div>{" "}
+                      <div style={{ width: "7%", textAlign: "center" }}>
+                        <span>x</span>
+                      </div>{" "}
+                      <div style={{ width: "15%", textAlign: "right" }}>
+                        <span>{product.price * product.quantity}</span>
+                      </div>
+                    </li>
+                  ))}
+                  {/* <div style={{ textAlign: "center" }}>{dash}</div> */}
+                  <hr className="hr" />
+                  <li className="product-item" style={{ display: "flex" }}>
+                    <div
+                      style={{
+                        width: "70%",
+                        textAlign: "center",
+                        fontWeight: 800,
+                      }}
+                    >
+                      <span>Total</span>
+                    </div>
+                    <div
+                      style={{
+                        width: "22%",
+                        textAlign: "right",
+                        fontWeight: 900,
+                      }}
+                    >
+                      <span>{calculateTotalPrice(productsToSend)}</span>
+                    </div>
+                    <div
+                      style={{
+                        width: "5%",
+                        textAlign: "left",
+                        fontWeight: 900,
+                      }}
+                    >
+                      <span>/-</span>
+                    </div>
+                  </li>
+                  {/* <div style={{ textAlign: "center" }}>{dash}</div> */}
+                  <hr className="hr" />
+                  <hr className="hr" style={{marginBottom: "3rem"}}/>
+
+                </ul>
+              </>
+            </div>
+          </div>
+        ) : (
+          <p className="no-products">No products found </p>
+        )}
       </div>
 
       <div className="invoice-btn">
