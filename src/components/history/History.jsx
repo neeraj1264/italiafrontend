@@ -147,7 +147,7 @@ const History = () => {
 
   const handleWhatsappClick = (order) => {
     const customerPhoneNumber = order.phone; // Correct field to access phone number
-    const message = `We hope you had a delightful order experience with us. Your feedback is incredibly valuable as we continue to enhance our services. How did you enjoy your meal? We’d love to hear your thoughts.\nTeam: Pizza Italia`;
+    const message = `We hope you had a delightful order experience with us. Your feedback is incredibly valuable as we continue to enhance our services. How did you enjoy your meal? We’d love to hear your thoughts.\nTeam: Foodies Hub`;
     // Create the WhatsApp URL to send the message
     const whatsappUrl = `https://wa.me/+91${customerPhoneNumber}?text=${encodeURIComponent(
       message
