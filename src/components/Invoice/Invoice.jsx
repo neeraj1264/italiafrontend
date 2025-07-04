@@ -352,7 +352,6 @@ const Invoice = () => {
     <div>
       <ToastContainer />
       <Header
-        headerName="Foodies Hub"
         setSearch={setSearch}
         onClick={toggleCategoryVisibility}
       />

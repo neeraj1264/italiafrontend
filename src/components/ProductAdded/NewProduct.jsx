@@ -229,10 +229,7 @@ const NewProduct = ({ setSelectedProducts }) => {
   return (
     <div>
       <ToastContainer />
-      <Header
-        headerName="Foodies Hub"
-      />
-      {/* <h1 className="catologue-header">New Product</h1> */}
+      <Header/>
       <div className="catologue-input-fields">
         <h1>Product Management</h1>
         <input
