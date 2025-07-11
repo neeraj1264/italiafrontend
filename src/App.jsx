@@ -51,7 +51,7 @@ const App = () => {
 
   const handleSubmit = () => {
     // Check if the entered password is correct
-    if (password === "0000") {
+    if (password === "6000") {
       localStorage.setItem("passwordCorrect", "true"); // Store password status in localStorage
       setIsPasswordCorrect(true);
       setShowPasswordPopup(false); // Close the password popup
