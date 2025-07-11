@@ -199,7 +199,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   word-wrap: break-word;
-  padding: .7rem .2rem;
+  padding: 1rem .2rem;
   text-align: center;
 }
 
@@ -769,19 +769,20 @@ margin-left: .4rem;
   padding: 0;
 }
 .quantity-badge {
-  position: absolute;
-  bottom: 4px;
-  right: 1px;
-  background-color: var(--bg);
-  color: white;
-  border-radius: 50%;
-  padding: 6px 8px;
-  font-size: 0.85rem;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    position: absolute;
+    color: white;
+    /* border-radius: 50%; */
+    /* padding: 6px 8px; */
+    font-size: 0.85rem;
+    font-weight: bold;
+    /* display: flex
+; */
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 0 1rem;
+    /* width: unset; */
+    background: var(--bg);
 }
 
 .quantity-badge span {

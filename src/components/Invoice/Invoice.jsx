@@ -627,6 +627,7 @@ const Invoice = () => {
                             }`}
                             onClick={() => handleProductClick(product)}
                           >
+                           
                             <div
                               className="sub-box"
                               style={{ position: "relative" }}
@@ -642,7 +643,9 @@ const Invoice = () => {
                               <p className="p-name-price">
                                 Rs. {effectivePrice.toFixed(2)}
                               </p>
-                              {productsToSend
+                          
+                            </div>
+                                 {productsToSend
                                 .filter((prod) => prod.name === product.name)
                                 .map((prod, i) => (
                                   <span
@@ -657,7 +660,6 @@ const Invoice = () => {
                                     </span>
                                   </span>
                                 ))}
-                            </div>
                           </div>
                         );
                       })}
