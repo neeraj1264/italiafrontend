@@ -769,25 +769,27 @@ margin-left: .4rem;
   padding: 0;
 }
 .quantity-badge {
-  display: flex;
-  justify-content: center;
-}
-.quantity-badge span {
-  position: relative;
-  bottom: 0;
-  right: 0;
-  background-color: #ff6600;
-  color: #fff;
-  width: 30px;
-  height: 24px;
+  position: absolute;
+  bottom: 4px;
+  right: 1px;
+  background-color: var(--bg);
+  color: white;
   border-radius: 50%;
-  font-size: 0.8rem;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  font-weight: bold;
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  font-weight: bold;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+
+.quantity-badge span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 
 
 @media (max-width: 1130px) {

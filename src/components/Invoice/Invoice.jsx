@@ -618,7 +618,7 @@ const Invoice = () => {
                               }`}
                               onClick={() => handleProductClick(product)}
                             >
-                              <div className="sub-box">
+                              <div className="sub-box" style={{ position: 'relative' }}>
                                 <h4 className="p-name">
                                   {product.name}
                                   {product.varieties &&
@@ -693,7 +693,8 @@ const Invoice = () => {
                         <span>{index + 1}.</span>
                       </div>
                       <div style={{ width: "50%" }}>
-                        <span>{product.name}</span>
+                           {product.name}
+                          {product.size ? ` (${product.size})` : ""}
                       </div>
                       <div className="quantity-btns">
                         <button
