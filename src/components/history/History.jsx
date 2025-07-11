@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { BASE_URL, fetchOrders, removeOrder, sendorder } from "../../api";
 import Header from "../header/Header";
 import { clearStore, deleteItem, getAll, saveItems } from "../../DB";
-import Rawbt3Inch from "../../../../src/components/Utils/Rawbt3Inch";
+import Rawbt3Inch from "../Utils/Rawbt3Inch";
 
 const History = () => {
   const [orders, setOrders] = useState([]);
@@ -340,10 +340,10 @@ const History = () => {
                           </tr>
                         ))}
 
-                            {/* ICONS ROW */}
-                                              <tr>
-                                                <td colSpan={5} style={{ textAlign: "center" }}>
-                                                  {/* <RawBTPrintButton
+                        {/* ICONS ROW */}
+                        <tr>
+                          <td colSpan={5} style={{ textAlign: "center" }}>
+                            {/* <RawBTPrintButton
                                                     productsToSend={order.products}
                                                     customerPhone={order.phone}
                                                     deliveryChargeAmount={order.delivery}
@@ -367,35 +367,36 @@ const History = () => {
                                                       />
                                                     )}
                                                   /> */}
-                                                  <Rawbt3Inch
-                                                    productsToSend={order.products}
-                                                    customerPhone={order.phone}
-                                                    customerName={order.name}
-                                                    customerAddress={order.address}
-                                                    deliveryChargeAmount={order.delivery}
-                                                    parsedDiscount={order.discount}
-                                                    timestamp={order.timestamp}
-                                                    includeGST={order.includeGST}
-                                                    icon={() => (
-                                                      <FaPrint
-                                                        size={32}
-                                                        style={{
-                                                          color: "#1abc9c",
-                                                          transition: "transform 0.1s ease",
-                                                          textAlign: "center",
-                                                        }}
-                                                        onMouseEnter={(e) =>
-                                                          (e.currentTarget.style.transform =
-                                                            "scale(1.2)")
-                                                        }
-                                                        onMouseLeave={(e) =>
-                                                          (e.currentTarget.style.transform = "scale(1)")
-                                                        }
-                                                      />
-                                                    )}
-                                                  />
-                                                </td>
-                                              </tr>
+                            <Rawbt3Inch
+                              productsToSend={order.products}
+                              customerPhone={order.phone}
+                              customerName={order.name}
+                              customerAddress={order.address}
+                              deliveryChargeAmount={order.delivery}
+                              parsedDiscount={order.discount}
+                              timestamp={order.timestamp}
+                              includeGST={order.includeGST}
+                              icon={() => (
+                                <FaPrint
+                                  size={32}
+                                  style={{
+                                    color: "#1abc9c",
+                                    transition: "transform 0.1s ease",
+                                    textAlign: "center",
+                                  }}
+                                  onMouseEnter={(e) =>
+                                    (e.currentTarget.style.transform =
+                                      "scale(1.2)")
+                                  }
+                                  onMouseLeave={(e) =>
+                                    (e.currentTarget.style.transform =
+                                      "scale(1)")
+                                  }
+                                />
+                              )}
+                            />
+                          </td>
+                        </tr>
                       </tbody>
                     </table>
                   )}
