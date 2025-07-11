@@ -1,46 +1,47 @@
-const fetchWithBaseUrl = async (endpoint, options = {}) => {
-  const BASE_URL = "https://italia-pizza-backend.vercel.app/api";
-  // const BASE_URL = "https://invoice-backend-7czy.vercel.app/api";
-  const response = await fetch(`${BASE_URL}${endpoint}`, options);
+export const BASE_URL = "https://italia-pizza-backend.vercel.app/api";
+// const BASE_URL = "http://localhost:5000/api";
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! Status: ${response.status}, Endpoint: ${endpoint}`);
-  }
-
+export const fetchCategories = async () => {
+  const response = await fetch(`${BASE_URL}/categories`);
   return response.json();
 };
 
-
-export const fetchCategories = async () => {
-  return fetchWithBaseUrl("/categories");
-};
-
 export const addCategory = async (name) => {
-  return fetchWithBaseUrl("/categories", {
+  const response = await fetch(`${BASE_URL}/categories`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name }),
   });
+  return response.json();
 };
 
 // New function to fetch products
 export const fetchProducts = async () => {
-  return fetchWithBaseUrl("/products");
-
+  const response = await fetch(`${BASE_URL}/products`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch products: ${response.statusText}`);
+  }
+  return response.json();
 };
 
 export const removeProduct = async (productName, productPrice) => {
-  return fetchWithBaseUrl("/products", {
+  const response = await fetch(`${BASE_URL}/products`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ name: productName, price: productPrice }),
   });
+
+  if (!response.ok) {
+    throw new Error("Failed to remove product from database");
+  }
+
+  return response.json(); // Optional: Return the API response
 };
 
 export const addProduct = async (product) => {
-  return fetchWithBaseUrl("/products", {
+  const response = await fetch(`${BASE_URL}/products`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -48,10 +49,15 @@ export const addProduct = async (product) => {
     body: JSON.stringify(product),
   });
 
+  if (!response.ok) {
+    throw new Error("Failed to save the product");
+  }
+
+  return response.json(); // Return the saved product
 };
 
 export const sendorder = async (order) => {
-  return fetchWithBaseUrl("/orders", {
+  const response = await fetch(`${BASE_URL}/orders`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -59,15 +65,23 @@ export const sendorder = async (order) => {
     body: JSON.stringify(order),
   });
 
+  if (!response.ok) {
+    throw new Error(`Failed to send order to the server ${response.statusText}`);
+  }
+
+  return response.json(); // Return the saved product
 };
 
 export const fetchOrders = async () => {
-  return fetchWithBaseUrl("/orders");
-
-}
+  const response = await fetch(`${BASE_URL}/orders`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch orders');
+  }
+  return response.json();
+};
 
 export const setdata = async (customerdata) => {
-  return fetchWithBaseUrl("/customerdata", {
+  const response = await fetch(`${BASE_URL}/customerdata`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -75,19 +89,37 @@ export const setdata = async (customerdata) => {
     body: JSON.stringify(customerdata),
   });
 
+  if (!response.ok) {
+    throw new Error(`Failed to send customerdata to the server ${response.statusText}`);
+  }
+
+  return response.json(); // Return the saved product
 };
 
 export const fetchcustomerdata = async () => {
-  return fetchWithBaseUrl("/customerdata");
-
+  try {
+    const response = await fetch(`${BASE_URL}/customerdata`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json(); // Parse JSON only if the response is OK
+  } catch (error) {
+    console.error("Error fetching customer data:", error.message);
+    throw error; // Rethrow for further handling
+  }
 };
 
 export const removeOrder = async (orderId) => {
-  return fetchWithBaseUrl(`/orders/${orderId}`, {
+  const response = await fetch(`${BASE_URL}/orders/${orderId}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
     },
   });
 
+  if (!response.ok) {
+    throw new Error('Failed to remove order from database');
+  }
+
+  return response.json(); // Return the API response
 };

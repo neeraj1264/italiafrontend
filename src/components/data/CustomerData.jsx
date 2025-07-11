@@ -4,6 +4,7 @@ import { fetchcustomerdata, fetchOrders } from "../../api"; // Import fetchOrder
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Header from "../header/Header";
+import { getAll, saveItems } from "../../DB";
 
 export const CustomerData = () => {
   const [customers, setCustomers] = useState([]);
@@ -22,9 +23,12 @@ export const CustomerData = () => {
         const storedCustomers = await fetchcustomerdata();
         setCustomers(storedCustomers);
         setFilteredCustomers(storedCustomers);
-      } catch (error) {
-        console.error("Error fetching customer data:", error.message);
-      } finally {
+        await saveItems('customers', storedCustomers);
+      }catch {
+        const offline = await getAll('customers');
+        setCustomers(offline);
+        setFilteredCustomers(offline);
+      }  finally {
         setLoading(false);
       }
     };
@@ -46,8 +50,10 @@ export const CustomerData = () => {
       try {
         const ordersData = await fetchOrders(); // Fetch orders from API
         setOrders(ordersData);
-      } catch (error) {
-        console.error("Error fetching orders:", error.message);
+        await saveItems('orders', data);
+      } catch {
+        const offline = await getAll('orders');
+        setOrders(offline);
       }
     };
 
@@ -125,10 +131,10 @@ export const CustomerData = () => {
                     <p>
                       <strong>Address:</strong> {customer.address}
                     </p>
-{/*                     <p>
+                    <p>
                       <strong>Total Lifetime Spend:</strong> ₹
                       {getLifetimeOrderTotal(customer.phone).toFixed(2)}
-                    </p> */}
+                    </p>
                     {/* Expanded view: display orders grouped by date */}
                     {expandedCustomer === customer.phone && (
                       <div className="customer-orders">

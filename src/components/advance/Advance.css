@@ -40,7 +40,7 @@
   .checkbox-container input {
     padding: 0.5rem;
     margin: 0.5rem 0;
-    width: 10%;
+    width: 20%;
   }
   .checkbox-container h4{
     font-size: 1rem;
@@ -49,6 +49,8 @@
     align-items: center;
     align-content: center;
     font-weight: bold;
+    width: 80%;
+    text-align: left;
   }
 
   /* Password Popup */

@@ -1,45 +1,30 @@
 // App.js
-import React, { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
+import React, { useState , useEffect} from "react";
+import { BrowserRouter as Router, Route, Routes, Navigate , useLocation} from "react-router-dom";
 import Invoice from "./components/Invoice/Invoice";
 import "./App.css";
 import CustomerDetail from "./components/CustomerDetail/CustomerDetail";
 import NewProduct from "./components/ProductAdded/NewProduct";
 import History from "./components/history/History";
 import { CustomerData } from "./components/data/CustomerData";
+import AddToHomeModal from "./components/AddToHome/AddToHome";
 import Advance from "./components/advance/Advance";
-import Login from "./components/login/Login"; 
 import OrderReport from "./OrderReport";
 
+
 const App = () => {
+
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [password, setPassword] = useState("");
   const [showPasswordPopup, setShowPasswordPopup] = useState(true);
 
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [installPrompt, setInstallPrompt] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [baseUrl, setBaseUrl] = useState(""); // Dynamic BASE_URL
 
   const currentRoute = window.location.pathname;
-  const USERS = JSON.parse(import.meta.env.VITE_USERS || "[]");
 
-  // Clear 'productsToSend' from localStorage on page reload
-  useEffect(() => {
-    // Check if the user is already logged in
-    const storedBaseUrl = localStorage.getItem("userBaseUrl");
-    if (storedBaseUrl) {
-      setBaseUrl(storedBaseUrl);
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
+   // Clear 'productsToSend' from localStorage on page reload
+   useEffect(() => {
 
     const storedPasswordStatus = localStorage.getItem("passwordCorrect");
     if (storedPasswordStatus === "true") {
@@ -60,6 +45,40 @@ const App = () => {
     };
   }, []);
 
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+
+  const handleSubmit = () => {
+    // Check if the entered password is correct
+    if (password === "0000") {
+      localStorage.setItem("passwordCorrect", "true"); // Store password status in localStorage
+      setIsPasswordCorrect(true);
+      setShowPasswordPopup(false); // Close the password popup
+    } else {
+      alert("Incorrect password. Please try again.");
+    }
+  };
+
+  const handleInstallClick = () => {
+    if (installPrompt instanceof Event) {
+      const installEvent = installPrompt;
+      installEvent.prompt();
+      installEvent.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the A2HS prompt');
+        } else {
+          console.log('User dismissed the A2HS prompt');
+        }
+        setInstallPrompt(null);
+      });
+    }
+  };
+
+  const handleCloseClick = () => {
+    setInstallPrompt(null);
+  };
+
   useEffect(() => {
     const handleBeforeInstallPrompt = (event) => {
       event.preventDefault();
@@ -68,59 +87,67 @@ const App = () => {
 
     const handleClickOutsidePopup = (event) => {
       // Check if the clicked element is not inside the install popup
-      if (!event.target.closest(".install-popup")) {
+      if (!event.target.closest('.install-popup')) {
         setInstallPrompt(null);
       }
     };
 
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    document.addEventListener("click", handleClickOutsidePopup);
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    document.addEventListener('click', handleClickOutsidePopup);
 
     return () => {
-      window.removeEventListener(
-        "beforeinstallprompt",
-        handleBeforeInstallPrompt
-      );
-      document.removeEventListener("click", handleClickOutsidePopup);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      document.removeEventListener('click', handleClickOutsidePopup);
     };
   }, []);
 
   return (
-      <Router>
-        {!isLoggedIn ? (
-          <Routes>
-            <Route
-              path="*"
-              element={
-                <Login
-                  setBaseUrl={(url) => {
-                    localStorage.setItem("userBaseUrl", url);
-                    setBaseUrl(url);
-                    setIsLoggedIn(true);
-                  }}
-                />
-              }
+    <>
+     {showPasswordPopup && !isPasswordCorrect && (
+        <div className="password-popup">
+          <div className="password-content">
+            <h3>Enter Password</h3>
+            <input
+              type="password"
+              value={password}
+              onChange={handlePasswordChange}
+              placeholder="Enter password"
             />
-          </Routes>
-        ) : (
-          <>
-            <Routes>
-              <Route path="/" element={<Navigate to="/invoice" />} />
-              <Route
-                path="/NewProduct"
-                element={<NewProduct setSelectedProducts={() => {}} />}
-              />
-              <Route path="/invoice" element={<Invoice />} />
-              <Route path="/customer-detail" element={<CustomerDetail />} />
-              <Route path="/customer-data" element={<CustomerData />} />
-              <Route path="/history" element={<History />} />
-              <Route path="/advance" element={<Advance />} />
-              <Route path="/report" element={<OrderReport />} />
-            </Routes>
-          </>
-        )}
-      </Router>
-        );
+            <button onClick={handleSubmit}>Submit</button>
+          </div>
+        </div>
+      )}
+       {isPasswordCorrect && (
+    <Router>
+      <Routes>
+      <Route path="/" element={<Navigate to="/invoice" />} />
+
+        <Route
+          path="/NewProduct"
+          element={<NewProduct setSelectedProducts={setSelectedProducts} />}
+        />
+        <Route
+          path="/invoice"
+          element={<Invoice selectedProducts={selectedProducts} />}
+        />
+        <Route path="/customer-detail" element={<CustomerDetail />} />
+        <Route path="/customer-data" element={<CustomerData />} />
+        <Route path="/history" element={<History />} />
+        <Route path="/advance" element={<Advance />} />
+        <Route path="/report" element={<OrderReport />} />
+
+      </Routes>
+    </Router>
+       )}
+      {installPrompt && currentRoute === '/invoice' && (
+        <AddToHomeModal
+        installPrompt={installPrompt}
+        onInstallClick={handleInstallClick}
+        onCloseClick={handleCloseClick}
+        />
+      )}
+      </>
+  );
 };
 
 export default App;

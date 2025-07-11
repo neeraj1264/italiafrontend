@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { FaImage } from "react-icons/fa6";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useMemo } from "react";
+import { FaFileInvoice, FaImage, FaTrash } from "react-icons/fa6";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./Invoice.css";
 import {
   FaMinusCircle,
@@ -9,6 +9,8 @@ import {
   FaBars,
   FaTimesCircle,
   FaSearch,
+  FaEdit,
+  FaShoppingCart,
 } from "react-icons/fa";
 // import { AiOutlineBars } from "react-icons/ai";
 import { IoMdCloseCircle } from "react-icons/io";
@@ -16,6 +18,9 @@ import Header from "../header/Header";
 import { fetchProducts, removeProduct } from "../../api";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { IoClose } from "react-icons/io5";
+import { getAll, saveItems } from "../../DB";
+import Rawbt3Inch from "../Utils/Rawbt3Inch";
 
 const toastOptions = {
   position: "bottom-right",
@@ -34,8 +39,54 @@ const Invoice = () => {
   const [selectedVariety, setSelectedVariety] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isCategoryVisible, setIsCategoryVisible] = useState(false);
+  const [activeCategory, setActiveCategory] = useState("");
+  const [includeGST, setIncludeGST] = useState(true);
+
+  const [isChecking, setIsChecking] = useState(false);
+
+  // default to “delivery”
+  const [orderType, setOrderType] = useState("delivery");
+
+  // two separate lists in localStorage
+  const [deliveryBills, setDeliveryBills] = useState(
+    () => JSON.parse(localStorage.getItem("deliveryKotData")) || []
+  );
+  const [dineInBills, setDineInBills] = useState(
+    () => JSON.parse(localStorage.getItem("dineInKotData")) || []
+  );
+
+  // tracks which list to show in the modal
+  const [modalType, setModalType] = useState("delivery"); // "delivery" or "dine-in"
+
+  const openBillsModal = (type) => {
+    setModalType(type);
+    setShowKotModal(true);
+  };
+
+  // State for modal visibility and data
+  const [showKotModal, setShowKotModal] = useState(false);
+  const [now, setNow] = useState(Date.now());
 
   const navigate = useNavigate(); // For navigation
+
+  // Update `now` every second for countdown
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Format milliseconds to HH:mm:ss
+  const formatRemaining = (ms) => {
+    if (ms <= 0) return "00:00:00";
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(
+      2,
+      "0"
+    );
+    const seconds = String(totalSeconds % 60).padStart(2, "0");
+    return `${hours}:${minutes}:${seconds}`;
+  };
 
   const [showRemoveBtn, setShowRemoveBtn] = useState(false);
   let pressTimer;
@@ -70,15 +121,64 @@ const Invoice = () => {
       return acc;
     }, {});
 
+  const location = useLocation();
+
+  // memoize sorted category list for consistency
+  const categories = useMemo(
+    () => Object.keys(filteredProducts).sort((a, b) => a.localeCompare(b)),
+    [filteredProducts]
+  );
+
+  // initialize activeCategory when filteredProducts first load
+  useEffect(() => {
+    if (categories.length) setActiveCategory(categories[0]);
+  }, [categories]);
+
+  // improved scroll‐spy
+  useEffect(() => {
+    const offset = 7 * 24; // px
+
+    const onScroll = () => {
+      // build array of {cat, distance} pairs
+      const distances = categories.map((cat) => {
+        const el = document.getElementById(cat);
+        const top = el ? el.getBoundingClientRect().top : Infinity;
+        return { cat, distance: top - offset };
+      });
+
+      // filter for those “above” the offset, then pick the one closest to it
+      const inView = distances
+        .filter((d) => d.distance <= 0)
+        .sort((a, b) => b.distance - a.distance);
+
+      setActiveCategory(inView[0]?.cat ?? categories[0]);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll(); // run once on mount
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [categories]);
+
+  useEffect(() => {
+    const fromCustomerDetail = location.state?.from === "customer-detail";
+    if (fromCustomerDetail) {
+      localStorage.removeItem("productsToSend");
+      setProductsToSend([]);
+    }
+  }, [location]);
+
   // Load products from localStorage on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         const products = await fetchProducts(); // Use the function from api.js
         setSelectedProducts(products);
+        await saveItems("products", products);
         setLoading(false);
-      } catch (error) {
-        console.error("Error fetching products:", error.message); // Logs the error message
+      } catch (err) {
+        console.warn("Fetch failed, loading from IDB:", err);
+        const prods = await getAll("products");
+        setSelectedProducts(prods);
         setLoading(false);
       }
     };
@@ -94,6 +194,18 @@ const Invoice = () => {
     // setSelectedVariety([]);
   }, []);
 
+  // Persist cart to IDB whenever it changes
+  useEffect(() => {
+    // clear old cart, then repopulate
+    const syncCart = async () => {
+      await saveItems(
+        "cart",
+        productsToSend.map((p, idx) => ({ ...p, id: idx }))
+      );
+    };
+    if (productsToSend.length) syncCart();
+  }, [productsToSend]);
+
   const handleOpenPopup = (product) => {
     if (product.varieties && product.varieties.length > 0) {
       setCurrentProduct(product);
@@ -108,6 +220,11 @@ const Invoice = () => {
     } else {
       handleAddToWhatsApp(product); // Directly add product if no varieties
     }
+  };
+  const handleProductClick = (product) => {
+    const audio = new Audio("/sounds/click.wav"); // path from public folder
+    audio.play();
+    handleOpenPopup(product);
   };
 
   // useEffect(() => {
@@ -314,11 +431,6 @@ const Invoice = () => {
     }
   };
 
-  // Navigate to the customer details page
-  const handleDone = () => {
-    navigate("/customer-detail"); // Navigate to customer detail page
-  };
-
   // Helper function to calculate total price
   const calculateTotalPrice = (products = []) => {
     return products.reduce(
@@ -328,6 +440,7 @@ const Invoice = () => {
   };
 
   const handleCategoryClick = (category) => {
+    setIsCategoryVisible((prev) => !prev);
     const categoryElement = document.getElementById(category);
     if (categoryElement) {
       // Calculate the offset position (7rem margin)
@@ -341,174 +454,227 @@ const Invoice = () => {
         behavior: "smooth",
       });
     }
-    setIsCategoryVisible((prev) => !prev);
+
+    setActiveCategory(category);
   };
 
   const toggleCategoryVisibility = () => {
     setIsCategoryVisible((prev) => !prev); // Toggle visibility
   };
 
+  // New: KOT (Kitchen Order Ticket) print handler
+  const handleKot = () => {
+    // Append current order snapshot
+    const kotEntry = {
+      timestamp: Date.now(),
+      date: new Date().toLocaleString(),
+      items: productsToSend,
+      orderType,
+    };
+
+    if (orderType === "delivery") {
+      const next = [...deliveryBills, kotEntry];
+      setDeliveryBills(next);
+      localStorage.setItem("deliveryKotData", JSON.stringify(next));
+    } else {
+      const next = [...dineInBills, kotEntry];
+      setDineInBills(next);
+      localStorage.setItem("dineInKotData", JSON.stringify(next));
+    }
+
+    // Clear current productsToSend
+    setProductsToSend([]);
+    localStorage.setItem("productsToSend", JSON.stringify([]));
+
+    const printArea = document.getElementById("sample-section");
+    if (!printArea) {
+      console.warn("No sample-section found to print.");
+      return;
+    }
+
+    const header = `
+  <div style="text-align:center; font-weight:700; margin-bottom:8px;">
+    ${orderType === "delivery" ? "Delivery" : "Dine-In"}
+  </div>
+`;
+
+    const printContent = header + printArea.innerHTML;
+    const win = window.open("", "", "width=600,height=400");
+    const style = `<style>
+  @page { size: 48mm auto; margin:0; }
+  @media print {
+    body{ width:48mm; margin:0; padding:4mm; font-size:1rem; }
+    .product-item{ display:flex; justify-content:space-between; margin-bottom:1rem;}
+    .hr{ border:none; border-bottom:1px solid #000; margin:2px 0;}
+    .invoice-btn{ display:none; }
+  }
+</style>`;
+
+    win.document.write(
+      `<html>
+      <head>
+      <title>KOT Ticket</title>
+     ${style}
+        </head>
+        <body>
+        ${printContent}
+        </body>
+        </html>`
+    );
+    win.document.close();
+    win.focus();
+    win.print();
+    win.close();
+  };
+
+  // define whatever cats you really want up top:
+  const priority = [
+    "Pizza",
+    "Family pizza",
+    "Indian twist pizza",
+    "Mini pizza",
+    "World wide pizza",
+    "Combo pizza",
+    "Extra",
+    
+  ];
+
+  // grab all your raw keys:
+  const rawCats = Object.keys(filteredProducts);
+
+  // split them into two groups:
+  const topCats = priority.filter((cat) => rawCats.includes(cat));
+  const otherCats = rawCats
+    .filter((cat) => !priority.includes(cat))
+    .sort((a, b) => a.localeCompare(b));
+
+  // final array drives **everything**:
+  const categoriess = [...topCats, ...otherCats];
+
   return (
     <div>
       <ToastContainer />
       <Header
+        headerName="Urban Pizzeria"
         setSearch={setSearch}
         onClick={toggleCategoryVisibility}
       />
-      {isCategoryVisible && (
-        <div className="category-b">
-          <div className="category-bar">
-            {Object.keys(filteredProducts)
-              .sort((a, b) => a.localeCompare(b))
-              .map((category, index) => (
-                <button
-                  key={index}
-                  className="category-btn"
-                  onClick={() => handleCategoryClick(category)} // Trigger scroll to category
-                >
-                  {category}
-                </button>
-              ))}
+      <div className="invoice-container">
+        {isCategoryVisible && (
+          <div className="category-barr">
+            <div className="category-b">
+              <div className="category-bar">
+                {categoriess.map((cat) => (
+                  <button
+                    key={cat}
+                    className={`category-btn ${
+                      activeCategory === cat ? "active" : ""
+                    }`}
+                    onClick={() => handleCategoryClick(cat)}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      )}
-      <div className="main">
-        {loading ? (
-          // Display loading effect when fetching data
-          <div className="lds-ripple">
-            <div></div>
-            <div></div>
-          </div>
-        ) : Object.keys(filteredProducts).length > 0 ? (
-          Object.keys(filteredProducts)
-            .sort((a, b) => a.localeCompare(b)) // Sort category names alphabetically
-            .map((category, index) => (
-              <div key={index} className="category-container">
-                <h2 className="category" id={category}>
-                  {category}
-                </h2>
-                {filteredProducts[category]
-                  .sort((a, b) => a.price - b.price) // Sort products by price in ascending order
-                  .map((product, idx) => (
-                    <>
-                      <hr />
-                      <div>
-                        <div key={idx} className="main-box">
-                          <div
-                            className="sub-box"
-                            onMouseDown={handlePressStart}
-                            onMouseUp={handlePressEnd}
-                            onTouchStart={handlePressStart}
-                            onTouchEnd={handlePressEnd}
-                          >
-                            <h4 className="p-name">
-                              {product.name}
-                              {product.varieties &&
-                              Array.isArray(product.varieties) &&
-                              product.varieties[0]?.size
-                                ? ` (${product.varieties[0].size})`
-                                : ""}
-                            </h4>
-                            <p className="p-name-price">
-                              Rs.{" "}
-                              {product.price
-                                ? product.price.toFixed(2) // Use product price if it exists
-                                : product.varieties.length > 0
-                                ? product.varieties[0].price.toFixed(2) // Fallback to first variety price
-                                : "N/A"}{" "}
-                              {/* Handle case when neither price nor varieties are available */}
-                              {showRemoveBtn && (
-                                <span
-                                  className="remove-btn"
-                                  onClick={() =>
-                                    handleRemoveProduct(
-                                      product.name,
-                                      product.price
-                                    )
-                                  }
-                                >
-                                  <FaTimesCircle />
-                                </span>
-                              )}
-                            </p>
-                          </div>
+        )}
+        <div className="main-section">
+          <div className="main">
+            {loading ? (
+              // Display loading effect when fetching data
+              <div className="lds-ripple">
+                <div></div>
+                <div></div>
+              </div>
+            ) : categoriess.length > 0 ? (
+              categoriess.map((category) => (
+                  <div key={category} className="category-block">
+                    <h2 className="category" id={category}>
+                      {category}
+                    </h2>
 
-                          {productsToSend.some(
-                            (prod) =>
-                              prod.name === product.name &&
-                              prod.price === product.price
-                          ) ? (
-                            <div className="quantity-btns">
-                              <button
-                                className="icons"
-                                onClick={() =>
-                                  handleQuantityChange(
-                                    product.name,
-                                    product.price,
-                                    -1
-                                  )
-                                }
-                              >
-                                <FaMinusCircle />
-                              </button>
-                              <span style={{ margin: "0 .4rem" }}>
-                                {productsToSend.find(
+                    <div key={category} className="category-container">
+                      {filteredProducts[category]
+                        .sort((a, b) => a.price - b.price) // Sort products by price in ascending order
+                        .map((product, idx) => {
+                          const effectivePrice = product.price
+                            ? product.price
+                            : product.varieties.length > 0
+                            ? product.varieties[0].price
+                            : 0;
+
+                          const quantity =
+                            productsToSend.find(
+                              (prod) =>
+                                prod.name === product.name &&
+                                prod.price === effectivePrice
+                            )?.quantity || 0;
+                          return (
+                            <div
+                              key={idx}
+                              className={`main-box ${
+                                quantity > 0 ? "highlighted" : ""
+                              }`}
+                              onClick={() => handleProductClick(product)}
+                            >
+                              <div className="sub-box">
+                                <h4 className="p-name">
+                                  {product.name}
+                                  {product.varieties &&
+                                  Array.isArray(product.varieties) &&
+                                  product.varieties[0]?.size
+                                    ? ` (${product.varieties[0].size})`
+                                    : ""}
+                                </h4>
+                                <p className="p-name-price">
+                                  Rs. {effectivePrice.toFixed(2)}
+                                </p>
+                                {(productsToSend.find(
                                   (prod) =>
                                     prod.name === product.name &&
-                                    prod.price === product.price
-                                )?.quantity || 1}
-                              </span>
-                              <button
-                                className="icons"
-                                onClick={() =>
-                                  handleQuantityChange(
-                                    product.name,
-                                    product.price,
-                                    1
-                                  )
-                                }
-                              >
-                                <FaPlusCircle />
-                              </button>
+                                    prod.price === effectivePrice
+                                )?.quantity || 0) > 0 && (
+                                  <span className="quantity-badge">
+                                    <span>
+                                      <FaShoppingCart />
+                                      {
+                                        productsToSend.find(
+                                          (prod) =>
+                                            prod.name === product.name &&
+                                            prod.price === effectivePrice
+                                        )?.quantity
+                                      }
+                                    </span>
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                          ) : (
-                            <div className="btn-box">
-                              <button
-                                onClick={() => handleOpenPopup(product)}
-                                className="add-btn"
-                              >
-                                Add
-                              </button>
-                              {product.varieties?.length > 0 && (
-                                <span className="customise-text">
-                                  Customise
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </>
-                  ))}
-              </div>
-            ))
-        ) : (
-          <div className="no-data">No data available</div>
-        )}
-        {productsToSend.length > 0 ? (
+                          );
+                        })}
+                    </div>
+                  </div>
+                ))
+            ) : (
+              <div className="no-data">No data available</div>
+            )}
+          </div>
+        </div>
+
+        {productsToSend.length > 0 && (
           <div className="sample-section">
             <div className="check-container">
               <>
                 <ul className="product-list" id="sample-section">
                   <hr className="hr" />
-                  <li className="product-item" style={{ display: "flex" }}>
+                  <li className="product-item" style={{ display: "flex", alignItems: "center" }}>
                     <div style={{ width: "10%" }}>
                       <span>No.</span>
                     </div>
                     <div style={{ width: "50%", textAlign: "left" }}>
                       <span>Name</span>
                     </div>
-                    <div style={{ width: "17%", textAlign: "center" }}>
+                    <div style={{ width: "25%", textAlign: "center" }}>
                       <span>Qty</span>
                     </div>
                     <div style={{ width: "15%", textAlign: "right" }}>
@@ -521,46 +687,43 @@ const Invoice = () => {
                     <li
                       key={index}
                       className="product-item"
-                      style={{ display: "flex" }}
+                      style={{ display: "flex", alignItems: "center" }}
                     >
                       <div style={{ width: "10%" }}>
                         <span>{index + 1}.</span>
                       </div>
-                      <div style={{ width: "45%" }}>
+                      <div style={{ width: "50%" }}>
                         <span>{product.name}</span>
                       </div>
-                      <div style={{ width: "25%", textAlign: "center" }}>
-                        <div className="quantity-btn">
-                          <button
-                            className="icon"
-                            onClick={() =>
-                              handleQuantityChange(
-                                product.name,
-                                product.price,
-                                -1
-                              )
-                            }
-                            // disabled={product.quantity <= 1}
-                          >
-                            <FaMinusCircle />
-                          </button>
-                          <span>
-                            {product.quantity}
-                          </span>
-                          <button
-                            className="icon"
-                            onClick={() =>
-                              handleQuantityChange(
-                                product.name,
-                                product.price,
-                                1
-                              )
-                            }
-                          >
-                            <FaPlusCircle />
-                          </button>
-                        </div>
-                      </div>{" "}
+                      <div className="quantity-btns">
+                        <button
+                          className="icons"
+                          onClick={() =>
+                            handleQuantityChange(
+                              product.name,
+                              product.price,
+                              -1
+                            )
+                          }
+                        >
+                          <FaMinusCircle />
+                        </button>
+                        <span style={{ margin: "0 .4rem" }}>
+                          {productsToSend.find(
+                            (prod) =>
+                              prod.name === product.name &&
+                              prod.price === product.price
+                          )?.quantity || 1}
+                        </span>
+                        <button
+                          className="icons"
+                          onClick={() =>
+                            handleQuantityChange(product.name, product.price, 1)
+                          }
+                        >
+                          <FaPlusCircle />
+                        </button>
+                      </div>
                       <div style={{ width: "15%", textAlign: "right" }}>
                         <span>{product.price * product.quantity}</span>
                       </div>
@@ -571,7 +734,7 @@ const Invoice = () => {
                   <li className="product-item" style={{ display: "flex" }}>
                     <div
                       style={{
-                        width: "70%",
+                        width: "77%",
                         textAlign: "center",
                         fontWeight: 800,
                       }}
@@ -580,7 +743,7 @@ const Invoice = () => {
                     </div>
                     <div
                       style={{
-                        width: "22%",
+                        width: "23%",
                         textAlign: "right",
                         fontWeight: 900,
                       }}
@@ -589,7 +752,6 @@ const Invoice = () => {
                     </div>
                     <div
                       style={{
-                        width: "5%",
                         textAlign: "left",
                         fontWeight: 900,
                       }}
@@ -599,30 +761,36 @@ const Invoice = () => {
                   </li>
                   {/* <div style={{ textAlign: "center" }}>{dash}</div> */}
                   <hr className="hr" />
-                  <hr className="hr" style={{ marginBottom: "3rem" }} />
+                  <hr className="hr" style={{ marginBottom: "1rem" }} />
                 </ul>
+
+                <div className="checkbox-gst-container">
+                  <input
+                    type="checkbox"
+                    checked={includeGST}
+                    onChange={(e) => setIncludeGST(e.target.checked)}
+                  />
+                  <label style={{ marginLeft: ".5rem" }}>
+                    Include GST (5%)
+                  </label>
+                </div>
+
+                <Rawbt3Inch
+                  className="kot-btn"
+                  productsToSend={productsToSend}
+                  includeGST={includeGST}
+                />
+                {/* <button
+                  onClick={handleKot}
+                  className="kot-btn"
+                  style={{ borderRadius: "0" }}
+                >
+                  <h2> Print Kot </h2>
+                </button> */}
               </>
             </div>
           </div>
-        ) : (
-          <p className="no-products">No products found </p>
         )}
-      </div>
-
-      <div className="invoice-btn">
-        <button
-          onClick={() => {
-            navigate("/NewProduct");
-          }}
-          className="invoice-kot-btn"
-        >
-          <h2> + PRODUCT </h2>
-        </button>
-
-        <button onClick={handleDone} className="invoice-next-btn">
-          <h2> NEXT ₹{calculateTotalPrice(productsToSend).toFixed(2)}</h2>
-          {/* <FaArrowRight className="Invoice-arrow" /> */}
-        </button>
       </div>
       {showPopup && currentProduct && currentProduct.varieties?.length > 0 && (
         <div className="popup-overlay">

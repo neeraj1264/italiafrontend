@@ -7,65 +7,63 @@ const Advance = ({ orders, setOrders }) => {
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
   const [password, setPassword] = useState("");
   const [isAdvancedAccessGranted, setIsAdvancedAccessGranted] = useState(false);
+  const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [advancedCheckboxState, setAdvancedCheckboxState] = useState(false);
+  const [normalCheckboxState, setNormalCheckboxState] = useState(false);
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false); // Track modal visibility
-  const [modalMessage, setModalMessage] = useState(""); // Modal message
 
-  const advpassword = localStorage.getItem("advpassword")
-  const AdvPassword = advpassword;
-  console.log("Advance password is :",AdvPassword);
+  const HARD_CODED_PASSWORD = "1947"; // Hardcoded password
 
   useEffect(() => {
     const advancedFeatureAccess = localStorage.getItem("advancedFeature");
+    const passwordCorrect = localStorage.getItem("passwordCorrect");
 
     if (advancedFeatureAccess === "true") {
       setIsAdvancedAccessGranted(true);
       setAdvancedCheckboxState(true);
     }
+    if (passwordCorrect === "true") {
+      setIsPasswordCorrect(true);
+      setNormalCheckboxState(true);
+    }
   }, []);
 
+  // Handle Password Submission
   const handlePasswordSubmit = () => {
-    if (password === AdvPassword) {
+    if (password === HARD_CODED_PASSWORD) {
+      setIsAdvancedAccessGranted(true);
+      setIsPasswordCorrect(true);
+      setShowPasswordPopup(false);
+      setAdvancedCheckboxState(true);
+      setNormalCheckboxState(true);
       localStorage.setItem("advancedFeature", "true");
-      setTimeout(() => {
-        setIsAdvancedAccessGranted(true);
-        setAdvancedCheckboxState(true);
-        setShowPasswordPopup(false);
-      }, 1500);
-      setModalMessage("Access granted");
-      setIsModalOpen(true); // Show the success modal
-      setTimeout(() => {
-        setIsModalOpen(false);
-      }, 1500);
+      localStorage.setItem("passwordCorrect", "true");
+      alert("Access granted!");
     } else {
-      setModalMessage("Incorrect password. Try again.");
-      setIsModalOpen(true); // Show the success modal
-      setTimeout(() => {
-        setIsModalOpen(false);
-      }, 1500);
+      alert("Incorrect password. Try again.");
     }
   };
 
+  // Handle Advanced Checkbox Click
   const handleAdvancedCheckboxClick = () => {
     if (advancedCheckboxState) {
+      // Uncheck logic
+      setAdvancedCheckboxState(false);
+      setIsAdvancedAccessGranted(false);
       localStorage.removeItem("advancedFeature");
-      setModalMessage("Access removed!");
-      setIsModalOpen(true); // Show the success modal
-      setTimeout(() => {
-        setAdvancedCheckboxState(false);
-        setIsAdvancedAccessGranted(false);
-      }, 1500);
-      setTimeout(() => {
-        setIsModalOpen(false);
-      }, 1500);
+      alert("Access removed!");
     } else {
-      setShowPasswordPopup(true);
+      // Check logic
+      setShowPasswordPopup(true); // Show password popup
     }
   };
 
-  const advancedFeatureAccess = localStorage.getItem("advancedFeature");
-  const modalBackgroundColor = advancedFeatureAccess === "true" ? "green" : "red"; // Set background color conditionally
+  // Handle Normal Checkbox Click
+  const handleNormalCheckboxClick = () => {
+    if (!normalCheckboxState) {
+      setShowPasswordPopup(true); // Show password popup
+    }
+  };
 
   return (
     <>
@@ -77,9 +75,22 @@ const Advance = ({ orders, setOrders }) => {
             <input
               type="checkbox"
               checked={advancedCheckboxState}
-              onChange={handleAdvancedCheckboxClick}
+              onChange={handleAdvancedCheckboxClick} // Manage state directly here
             />
             <h4>Access Advanced Features</h4>
+          </label>
+        </div>
+
+        {/* Normal Features Checkbox */}
+        <div className="checkbox-container">
+          <label>
+            <input
+              type="checkbox"
+              checked={normalCheckboxState}
+              onChange={() => {}} // Prevent default behavior
+              onClick={handleNormalCheckboxClick} // Show popup if unchecked
+            />
+            <h4>Employee</h4>
           </label>
         </div>
 
@@ -102,15 +113,6 @@ const Advance = ({ orders, setOrders }) => {
           </div>
         )}
       </div>
-
-      {/* Custom Modal */}
-      {isModalOpen && (
-        <div className="custom-modal-overlay">
-          <div className="custom-modal-content-history"  style={{ backgroundColor: modalBackgroundColor }} >
-            <p className="custom-modal-message-history">{modalMessage}</p>
-          </div>
-        </div>
-      )}
     </>
   );
 };

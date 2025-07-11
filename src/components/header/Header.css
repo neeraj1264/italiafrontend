@@ -1,12 +1,14 @@
 .custom-navbar {
   padding: 0;
   border-radius: 0 0 1rem 1rem;
-  box-shadow: 2px 2px 2px 2px var(--bg);
+  box-shadow: 0px 1px 7px 2px grey;
   background-color: white;
 }
 
 .custom-text {
   color: var(--bg) !important; /* Custom text color */
+  font-size: 1.1rem;
+
 }
 
 .custom-navbar .navbar-toggler,
@@ -21,7 +23,7 @@
   margin: 0;
   font-weight: bold;
 }
-.search {
+.search{
   width: 50%;
 }
 .navbar-toggler:focus {
@@ -61,12 +63,9 @@
   border: 2px solid var(--bg);
   border-radius: 2rem;
   background: #eee;
-  padding: .3rem.5rem !important;
+  padding: .3rem .5rem !important;
+  box-shadow: 3px 1px 5px 0px grey;
 }
-/* input::placeholder {
-  color: var(--bg); 
-  opacity: 1;
-} */
 
 input:focus::placeholder {
   color: var(--bg); /* Optional: Change color when input is focused */
@@ -87,68 +86,15 @@ input:focus::placeholder {
   text-decoration: underline;
 }
 
-.search {
+.search{
   display: none;
 }
 
 @media (max-width: 768px) {
-  .d-flex-search {
-    display: none;
-  }
-  .search {
-    display: block;
-  }
+.d-flex-search{
+  display: none;
 }
-
-/* Modal */
-.custom-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+.search{
+  display: block;
 }
-
-.custom-modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 300px;
-  text-align: center;
-}
-
-.custom-modal-message {
-  margin-bottom: 20px;
-  font-size: 16px;
-}
-
-.custom-modal-actions {
-  display: flex;
-  justify-content: space-between;
-}
-
-.custom-modal-button {
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.cancel-button {
-  background-color: #f0f0f0;
-  color: #333;
-}
-
-.confirm-button {
-  background-color: #e74c3c;
-  color: #fff;
-}
-
-.custom-modal-button:hover {
-  opacity: 0.9;
 }

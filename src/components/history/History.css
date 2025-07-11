@@ -1,5 +1,5 @@
 .history-container {
-  margin: 2rem .3rem;
+  margin: 4rem .3rem;
   font-family: Arial, sans-serif;
 }
 .back-arrow {
@@ -57,7 +57,6 @@ h2 {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 2rem;
-  table-layout: fixed;   
 }
 
 .details-table th,
@@ -72,7 +71,6 @@ h2 {
 .products-table th {
   background-color: #f4f4f4;
   font-weight: bold;
-  text-align: center;
 }
 
 .details-table td {
@@ -86,7 +84,31 @@ h2 {
 .products-table tr:hover {
   background-color: #f1f1f1;
 }
-
+.products-table th:nth-child(1), 
+.products-table td:nth-child(1) { 
+  width: 5%; 
+  text-align: center;
+}
+.products-table th:nth-child(2), 
+.products-table td:nth-child(2) { 
+  width: 50%; 
+  text-align: left;
+}
+.products-table th:nth-child(3), 
+.products-table td:nth-child(3) { 
+  width: 15%; 
+  text-align: right;
+}
+.products-table th:nth-child(4), 
+.products-table td:nth-child(4) { 
+  width: 10%; 
+  text-align: right;
+}
+.products-table th:nth-child(5), 
+.products-table td:nth-child(5) { 
+  width: 20%; 
+  text-align: right;
+}
 .amount {
   font-size: 1.5rem;
   font-weight: bold;
@@ -110,49 +132,3 @@ hr{
   animation: pulsate 1s infinite;
 }
 
-.custom-modal-content-history{
-  padding: 20px;
-  border-radius: 8px;
-  width: 300px;
-  text-align: center;
-  background: red;
-}
-
-.custom-modal-message-history{
-  margin-bottom: 20px;
-  font-size: 16px;
-  color: white;
-}
-
-.confirm-button-history{
-  margin: auto;
-  padding: .5rem 1rem;
-}
-.order-lable{
-  padding: 0 .3rem;
-}
-.order-lable h2{
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-/* give explicit widths to Price, Qty, Total columns */
-.products-table th:nth-child(2),
-.products-table td:nth-child(2) { width: 55px; }  /* Price */
-.products-table th:nth-child(3),
-.products-table td:nth-child(3) { width: 45px; }  /* Qty */
-.products-table th:nth-child(4),
-.products-table td:nth-child(4) { width: 55px; }  /* Total */
-
-.deletebtn {
-  cursor: pointer;
-  color: red;
-  font-size: 2rem;
-  border: none;
-  padding: 0;
-  margin: 0;
-  /* background: white; */
-  /* border: navajowhite; */
-  /* position: absolute; */
-  width: fit-content;
-}

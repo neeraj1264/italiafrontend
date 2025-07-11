@@ -1,10 +1,11 @@
 // src/Utils/RawBTPrintButton.jsx
-import React from "react";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import { addItem } from "../../DB";
+import { sendorder, setdata, fetchcustomerdata } from "../../api";
 
 export default function Rawbt3Inch({
   productsToSend,
-  parsedDiscount,
-  deliveryChargeAmount,
   customerPhone,
   customerName,
   customerAddress,
@@ -17,8 +18,13 @@ export default function Rawbt3Inch({
   const calculateTotalPrice = (items = []) =>
     items.reduce((sum, p) => sum + p.price * (p.quantity || 1), 0);
 
- const handleRawBTPrint = () => {
-    const hasDeliveryCharge = deliveryChargeAmount !== 0; // Check if delivery charge exists
+  const [isPrinting, setIsPrinting] = useState(false);
+
+ const handleRawBTPrint = async() => {
+
+  // guard: ignore if already in progress
+   if (isPrinting) return;
+   setIsPrinting(true);
 
     const orderWidth = 2;
     const nameWidth = 26; // Set a fixed width for product name
@@ -88,11 +94,7 @@ export default function Rawbt3Inch({
       priceWidth,
       " "
     );
-       const DiscountAmount = `${parsedDiscount}`.padStart(
-      priceWidth,
-      " "
-    );
-    const delivery = `${deliveryChargeAmount}`.padStart(priceWidth, " ");
+
     // Combine header, separator, and product details
     const detailedItems = `${dash}\n${header}\n${dash}\n${productDetails}\n${dash}`;
 
@@ -112,39 +114,25 @@ export default function Rawbt3Inch({
   const itemTotal = calculateTotalPrice(productsToSend);
   const gstAmount = includeGST ? +(itemTotal * 0.05).toFixed(2) : 0;
 
-  const invoiceText = `
-\x1B\x61\x01\x1D\x21\x33Pizza Italia\x1D\x21\x00
-\x1B\x61\x01\x1D\x21\x10OPP. BAJAJ BIKE AGENCY\x1B\x21\x00
-\x1B\x61\x01\x1D\x21\x10KAITHAL ROAD PEHOWA\x1B\x21\x00
-\x1B\x61\x01\x1D\x21\x10 7222006000 9992271872\x1B\x21\x00    
-\x1B\x61\x01\x1D\x21\x10 GstNo:06QTIPS7467A1Z1\x1B\x21\x00\x1B\x61\x00
-  \x1B\x21\x30---Invoice Details---\x1B\x21\x00
-  \x1B\x21\x20${formattedDate} ${formattedTime}\x1B\x21\x00
-\x1B\x21\x20 Bill No: #${Math.floor(1000 + Math.random() * 9000)}\x1B\x21\x00
-${
-  [customerName, customerPhone, customerAddress]
-    .map((value, index) => {
-      if (!value) return "";
-      const label = ["Name   :", "Phone  :", "Address:"][index];
-      return `\x1B\x21\x20 ${label} ${value}\x1B\x21\x00`;
-    })
-    .filter(Boolean)
-    .join("\n")
-}
+  const invoiceText = 
+`\x1B\x61\x01\x1D\x21\x23Pizza Italia\x1D\x21\x00
+\x1B\x61\x01\x1D\x11\x10OPP. BAJAJ BIKE AGENCY\x1B\x11\x00
+\x1B\x61\x01\x1D\x11\x10KAITHAL ROAD PEHOWA\x1B\x11\x00
+   \x1B\x61\x01\x1D\x11\x10 7222006000 9992271872\x1B\x11\x00    
+\x1B\x61\x01\x1D\x11\x10 GstNo:06QTIPS7467A1Z1\x1B\x11\x00
+        \x1B\x61\x01\x1B\x21\x10---------Invoice Details---------\x1B\x21\x00\x1B\x61\x00
+\x1D\x11\x10 ${formattedDate} ${formattedTime}\x1D\x11\x00
+\x1D\x11\x10 Bill No: #${Math.floor(1000 + Math.random() * 9000)}\x1D\x11\x00
 ${detailedItems}
   ${[
-  `Item Total:                             ${totalprice} `,
+  includeGST && `Item Total:                             ${totalprice} `,
   includeGST && `  GST (5%):                               +${gstAmount} `,
-  hasDeliveryCharge ? `  Delivery Charge:                       +${delivery}` : "",
-  parsedDiscount > 0
-    ? `  Discount:                              -${DiscountAmount}\n${dash}`
-    : ""
 ]
   .filter(Boolean)
   .join("\n")}
 
 \x1B\x21\x30    Total: Rs ${
-      calculateTotalPrice(productsToSend) + (includeGST ? gstAmount : 0) + deliveryChargeAmount - parsedDiscount
+      calculateTotalPrice(productsToSend) + (includeGST ? gstAmount : 0)
     }/-  \x1B\x21\x00
 
           Thank You Visit Again!\n${dash}
@@ -156,8 +144,56 @@ ${detailedItems}
     const encodedText = encodeURIComponent(invoiceText);
     const rawBTUrl = `intent:${encodedText}#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;`;
 
+
+
+       const orderId = `order_${Date.now()}`;
+    const dateISO = new Date(timestamp || Date.now()).toISOString();
+    const { discountValue = 0, netTotal = calculateTotalPrice(productsToSend) } = {
+      discountValue: 0,
+      netTotal: calculateTotalPrice(productsToSend) + (includeGST ? +(calculateTotalPrice(productsToSend) * 0.05).toFixed(2) : 0)
+    };
+
+    const order = {
+      id: orderId,
+      products: productsToSend,
+      totalAmount: netTotal,
+      discountApplied: discountValue,
+      name: customerName,
+      phone: customerPhone,
+      address: customerAddress,
+      timestamp: dateISO,
+    };
+
+    const customerDataObject = {
+      id: orderId,
+      name: customerName,
+      phone: customerPhone,
+      address: customerAddress,
+      timestamp: dateISO,
+    };
+
+    // try {
+    //   await addItem("orders", order);
+    //   await addItem("customers", customerDataObject);
+    //   // optional: give user feedback
+    //   toast.success("Order saved to history", { autoClose: 1500 });
+    // } catch (err) {
+    //   console.error("Failed to save print history:", err);
+    //   toast.error("Could not save order history", { autoClose: 1500 });
+    // }
+ try {
+      await sendorder(order);
+      await setdata(customerDataObject);
+    } catch (err) {
+      toast.info("Error sending online order:", err);
+    }
+
     // Trigger RawBT
     window.location.href = rawBTUrl;
+
+    // a standard reload
+window.location.reload();
+
   };
 
   return (
@@ -165,7 +201,11 @@ ${detailedItems}
       {Icon ? (
         <Icon/>
       ) : (
-        <button className="popupButton" >Mobile Print</button>
+        <button className="kot-btn" 
+        disabled={isPrinting}
+      style={{ opacity: isPrinting ? 0.5 : 1, cursor: isPrinting ? "not-allowed" : "pointer" }}
+
+        >Mobile Print</button>
       )}
       </div>
   );
