@@ -536,7 +536,6 @@ const Invoice = () => {
     "World wide pizza",
     "Combo pizza",
     "Extra",
-    
   ];
 
   // grab all your raw keys:
@@ -589,72 +588,82 @@ const Invoice = () => {
               </div>
             ) : categoriess.length > 0 ? (
               categoriess.map((category) => (
-                  <div key={category} className="category-block">
-                    <h2 className="category" id={category}>
-                      {category}
-                    </h2>
+                <div key={category} className="category-block">
+                  <h2 className="category" id={category}>
+                    {category}
+                  </h2>
 
-                    <div key={category} className="category-container">
-                      {filteredProducts[category]
-                        .sort((a, b) => a.price - b.price) // Sort products by price in ascending order
-                        .map((product, idx) => {
-                          const effectivePrice = product.price
-                            ? product.price
-                            : product.varieties.length > 0
-                            ? product.varieties[0].price
-                            : 0;
+                  <div key={category} className="category-container">
+                    {filteredProducts[category]
+                      .sort((a, b) => a.price - b.price) // Sort products by price in ascending order
+                      .map((product, idx) => {
+                        const effectivePrice = product.price
+                          ? product.price
+                          : product.varieties.length > 0
+                          ? product.varieties[0].price
+                          : 0;
 
-                          const quantity =
-                            productsToSend.find(
-                              (prod) =>
-                                prod.name === product.name &&
-                                prod.price === effectivePrice
-                            )?.quantity || 0;
-                          return (
+                        const quantity =
+                          productsToSend.find(
+                            (prod) =>
+                              prod.name === product.name &&
+                              prod.price === effectivePrice
+                          )?.quantity || 0;
+
+                        const isSelected = productsToSend.some(
+                          (p) =>
+                            p.name === product.name &&
+                            (!product.varieties?.length ||
+                              product.varieties.some(
+                                (v) => v.price === p.price && v.size === p.size
+                              ))
+                        );
+
+                        return (
+                          <div
+                            key={idx}
+                            className={`main-box ${
+                              isSelected ? "highlighted" : ""
+                            }`}
+                            onClick={() => handleProductClick(product)}
+                          >
                             <div
-                              key={idx}
-                              className={`main-box ${
-                                quantity > 0 ? "highlighted" : ""
-                              }`}
-                              onClick={() => handleProductClick(product)}
+                              className="sub-box"
+                              style={{ position: "relative" }}
                             >
-                              <div className="sub-box" style={{ position: 'relative' }}>
-                                <h4 className="p-name">
-                                  {product.name}
-                                  {product.varieties &&
-                                  Array.isArray(product.varieties) &&
-                                  product.varieties[0]?.size
-                                    ? ` (${product.varieties[0].size})`
-                                    : ""}
-                                </h4>
-                                <p className="p-name-price">
-                                  Rs. {effectivePrice.toFixed(2)}
-                                </p>
-                                {(productsToSend.find(
-                                  (prod) =>
-                                    prod.name === product.name &&
-                                    prod.price === effectivePrice
-                                )?.quantity || 0) > 0 && (
-                                  <span className="quantity-badge">
+                              <h4 className="p-name">
+                                {product.name}
+                                {product.varieties &&
+                                Array.isArray(product.varieties) &&
+                                product.varieties[0]?.size
+                                  ? ` (${product.varieties[0].size})`
+                                  : ""}
+                              </h4>
+                              <p className="p-name-price">
+                                Rs. {effectivePrice.toFixed(2)}
+                              </p>
+                              {productsToSend
+                                .filter((prod) => prod.name === product.name)
+                                .map((prod, i) => (
+                                  <span
+                                    key={i}
+                                    className="quantity-badge"
+                                  >
                                     <span>
-                                      <FaShoppingCart />
-                                      {
-                                        productsToSend.find(
-                                          (prod) =>
-                                            prod.name === product.name &&
-                                            prod.price === effectivePrice
-                                        )?.quantity
-                                      }
+                                      <FaShoppingCart
+                                        style={{ marginRight: "4px" }}
+                                      />
+                                      {prod.quantity}
                                     </span>
                                   </span>
-                                )}
-                              </div>
+                                ))}
                             </div>
-                          );
-                        })}
-                    </div>
+                          </div>
+                        );
+                      })}
                   </div>
-                ))
+                </div>
+              ))
             ) : (
               <div className="no-data">No data available</div>
             )}
@@ -667,7 +676,10 @@ const Invoice = () => {
               <>
                 <ul className="product-list" id="sample-section">
                   <hr className="hr" />
-                  <li className="product-item" style={{ display: "flex", alignItems: "center" }}>
+                  <li
+                    className="product-item"
+                    style={{ display: "flex", alignItems: "center" }}
+                  >
                     <div style={{ width: "10%" }}>
                       <span>No.</span>
                     </div>
@@ -684,54 +696,59 @@ const Invoice = () => {
                   {/* <div style={{ textAlign: "center" }}>{dash}</div> */}
                   <hr className="hr" />
                   {productsToSend.map((product, index) => (
-                    <li
-                      key={index}
-                      className="product-item"
-                      style={{ display: "flex", alignItems: "center" }}
-                    >
-                      <div style={{ width: "10%" }}>
-                        <span>{index + 1}.</span>
-                      </div>
-                      <div style={{ width: "50%" }}>
-                           {product.name}
+                    <>
+                      <li
+                        key={index}
+                        className="product-item"
+                        style={{ display: "flex", alignItems: "center" }}
+                      >
+                        <div style={{ width: "10%" }}>
+                          <span>{index + 1}.</span>
+                        </div>
+                        <div style={{ width: "50%" }}>
+                          {product.name}
                           {product.size ? ` (${product.size})` : ""}
-                      </div>
-                      <div className="quantity-btns">
-                        <button
-                          className="icons"
-                          onClick={() =>
-                            handleQuantityChange(
-                              product.name,
-                              product.price,
-                              -1
-                            )
-                          }
-                        >
-                          <FaMinusCircle />
-                        </button>
-                        <span style={{ margin: "0 .4rem" }}>
-                          {productsToSend.find(
-                            (prod) =>
-                              prod.name === product.name &&
-                              prod.price === product.price
-                          )?.quantity || 1}
-                        </span>
-                        <button
-                          className="icons"
-                          onClick={() =>
-                            handleQuantityChange(product.name, product.price, 1)
-                          }
-                        >
-                          <FaPlusCircle />
-                        </button>
-                      </div>
-                      <div style={{ width: "15%", textAlign: "right" }}>
-                        <span>{product.price * product.quantity}</span>
-                      </div>
-                    </li>
+                        </div>
+                        <div className="quantity-btns">
+                          <button
+                            className="icons"
+                            onClick={() =>
+                              handleQuantityChange(
+                                product.name,
+                                product.price,
+                                -1
+                              )
+                            }
+                          >
+                            <FaMinusCircle />
+                          </button>
+                          <span style={{ margin: "0 .4rem" }}>
+                            {productsToSend.find(
+                              (prod) =>
+                                prod.name === product.name &&
+                                prod.price === product.price
+                            )?.quantity || 1}
+                          </span>
+                          <button
+                            className="icons"
+                            onClick={() =>
+                              handleQuantityChange(
+                                product.name,
+                                product.price,
+                                1
+                              )
+                            }
+                          >
+                            <FaPlusCircle />
+                          </button>
+                        </div>
+                        <div style={{ width: "15%", textAlign: "right" }}>
+                          <span>{product.price * product.quantity}</span>
+                        </div>
+                      </li>
+                      <hr />
+                    </>
                   ))}
-                  {/* <div style={{ textAlign: "center" }}>{dash}</div> */}
-                  <hr className="hr" />
                   <li className="product-item" style={{ display: "flex" }}>
                     <div
                       style={{
@@ -761,7 +778,6 @@ const Invoice = () => {
                     </div>
                   </li>
                   {/* <div style={{ textAlign: "center" }}>{dash}</div> */}
-                  <hr className="hr" />
                   <hr className="hr" style={{ marginBottom: "1rem" }} />
                 </ul>
 
