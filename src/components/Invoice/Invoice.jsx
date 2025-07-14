@@ -168,31 +168,37 @@ const Invoice = () => {
   }, [location]);
 
   // Load products from localStorage on component mount
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const products = await fetchProducts(); // Use the function from api.js
-        setSelectedProducts(products);
-        await saveItems("products", products);
-        setLoading(false);
-      } catch (err) {
-        console.warn("Fetch failed, loading from IDB:", err);
-        const prods = await getAll("products");
-        setSelectedProducts(prods);
-        setLoading(false);
-      }
-    };
+useEffect(() => {
+  const loadAndSyncProducts = async () => {
+    // 1. Load from IDB first
+    const cached = await getAll("products");
+    if (cached && cached.length) {
+      setSelectedProducts(cached);
+      setLoading(false);
+    }
 
-    fetchData();
+    // 2. Then try fetching fresh data
+    try {
+      const fresh = await fetchProducts();
+      setSelectedProducts(fresh);
+      await saveItems("products", fresh);
+    } catch (err) {
+      console.warn("Network fetch failed, continuing with cache:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const storedProductsToSend =
-      JSON.parse(localStorage.getItem("productsToSend")) || [];
-    setProductsToSend(storedProductsToSend);
+  loadAndSyncProducts();
 
-    localStorage.removeItem("deliveryCharge");
+  // restore cart from localStorage as before
+  const stored = JSON.parse(localStorage.getItem("productsToSend")) || [];
+  setProductsToSend(stored);
 
-    // setSelectedVariety([]);
-  }, []);
+  // clear any transient localStorage keys
+  localStorage.removeItem("deliveryCharge");
+}, []);
+
 
   // Persist cart to IDB whenever it changes
   useEffect(() => {
