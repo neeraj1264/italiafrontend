@@ -340,9 +340,20 @@ const History = () => {
                           </tr>
                         ))}
 
+                        {order.includeGST && order.gstAmount > 0 && (
+                          <tr>
+                            <td colSpan={4} style={{ textAlign: "right" }}>
+                              <strong>GST (5%):</strong>
+                            </td>
+                            <td style={{ textAlign: "right" }}>
+                              <strong>+₹{order.gstAmount.toFixed(2)}</strong>
+                            </td>
+                          </tr>
+                        )}
+
                         {/* ICONS ROW */}
-                        
-{/*                         <tr>
+
+                        {/*                         <tr>
                           <td colSpan={5} style={{ textAlign: "center" }}>
                       
                             <Rawbt3Inch

@@ -162,6 +162,8 @@ ${detailedItems}
       phone: customerPhone,
       address: customerAddress,
       timestamp: dateISO,
+      gstAmount,
+      includeGST,
     };
 
     const customerDataObject = {
