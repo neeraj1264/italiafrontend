@@ -135,8 +135,8 @@ ${detailedItems}
       calculateTotalPrice(productsToSend) + (includeGST ? gstAmount : 0)
     }/-  \x1B\x21\x00
 
-          Thank You Visit Again!\n${dash}
-             Powered by BillZo
+            Thank You Visit Again!\n${dash}
+               Powered by BillZo
        
   `;
 

@@ -647,7 +647,7 @@ useEffect(() => {
                                   : ""}
                               </h4>
                               <p className="p-name-price">
-                                Rs. {effectivePrice.toFixed(2)}
+                                Rs. {effectivePrice}
                               </p>
                           
                             </div>

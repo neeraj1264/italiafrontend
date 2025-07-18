@@ -195,6 +195,15 @@ const History = () => {
     }
   };
 
+    useEffect(() => {
+    const isAdvancedEnabled =
+      localStorage.getItem("advancedFeature") === "true";
+
+    if (!isAdvancedEnabled) {
+      navigate("/invoice");
+    }
+  }, []);
+  
   return (
     <div>
       <Header headerName="Order History" />

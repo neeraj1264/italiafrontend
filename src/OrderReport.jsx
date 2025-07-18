@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useMemo } from "react";
 import Chart from "chart.js/auto";
 import { fetchOrders } from "./api";
 import Header from "./components/header/Header";
+import { useNavigate } from "react-router-dom";
 
 const OrderReport = () => {
   const chartRef = useRef(null);
@@ -15,6 +16,7 @@ const OrderReport = () => {
   const [selectedPeriod, setSelectedPeriod] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expandedOrderId, setExpandedOrderId] = useState(null); // Track expanded order
+  const navigate = useNavigate();
 
   // Fetch orders when component mounts
   useEffect(() => {
@@ -80,11 +82,12 @@ const OrderReport = () => {
 
       orders.forEach((order) => {
         const orderDate = new Date(order.timestamp);
-        const monthKey = `${orderDate.getFullYear()}-${orderDate.getMonth() + 1}`;
+        const monthKey = `${orderDate.getFullYear()}-${
+          orderDate.getMonth() + 1
+        }`;
         ordersByMonth[monthKey] =
           (ordersByMonth[monthKey] || 0) + order.totalAmount;
-        orderCountByMonth[monthKey] =
-          (orderCountByMonth[monthKey] || 0) + 1;
+        orderCountByMonth[monthKey] = (orderCountByMonth[monthKey] || 0) + 1;
 
         if (!dataMap[monthKey]) dataMap[monthKey] = [];
         dataMap[monthKey].push(order);
@@ -101,10 +104,8 @@ const OrderReport = () => {
       orders.forEach((order) => {
         const orderDate = new Date(order.timestamp);
         const year = orderDate.getFullYear();
-        ordersByYear[year] =
-          (ordersByYear[year] || 0) + order.totalAmount;
-        orderCountByYear[year] =
-          (orderCountByYear[year] || 0) + 1;
+        ordersByYear[year] = (ordersByYear[year] || 0) + order.totalAmount;
+        orderCountByYear[year] = (orderCountByYear[year] || 0) + 1;
 
         if (!dataMap[year]) dataMap[year] = [];
         dataMap[year].push(order);
@@ -242,15 +243,26 @@ const OrderReport = () => {
 
   // Format the date string for display
   const formatDate = (timestamp) =>
-    new Date(timestamp).toLocaleString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    }).replace(/\//g, "-");
+    new Date(timestamp)
+      .toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      })
+      .replace(/\//g, "-");
+
+  useEffect(() => {
+    const isAdvancedEnabled =
+      localStorage.getItem("advancedFeature") === "true";
+
+    if (!isAdvancedEnabled) {
+      navigate("/invoice");
+    }
+  }, []);
 
   return (
     <>
