@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbCameraPlus } from "react-icons/tb";
 import { FaTimes, FaArrowRight, FaCheckCircle } from "react-icons/fa";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./NewProduct.css";
 import { fetchCategories, addCategory, addProduct } from "../../api";
@@ -232,7 +232,6 @@ const NewProduct = ({ setSelectedProducts }) => {
 
   return (
     <div>
-      <ToastContainer />
       <Header
         headerName="Foodies Hub"
       />

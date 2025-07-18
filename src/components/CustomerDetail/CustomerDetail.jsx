@@ -7,7 +7,7 @@ import "./Customer.css";
 // import { handleScreenshotAsPDF } from "../Utils/DownloadPdf";
 import Header from "../header/Header";
 import { sendorder, setdata, fetchcustomerdata } from "../../api";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaWhatsapp } from "react-icons/fa6";
 import { IoPrint } from "react-icons/io5";
@@ -385,7 +385,6 @@ const CustomerDetail = () => {
 
   return (
     <div>
-      <ToastContainer />
       <Header />
       <div className="cust-inputs" style={{ marginTop: "4rem" }}>
         <input

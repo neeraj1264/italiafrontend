@@ -6,6 +6,7 @@ import { BASE_URL, fetchOrders, removeOrder, sendorder } from "../../api";
 import Header from "../header/Header";
 import { clearStore, deleteItem, getAll, saveItems } from "../../DB";
 import Rawbt3Inch from "../Utils/Rawbt3Inch";
+import { toast } from "react-toastify";
 
 const History = () => {
   const [orders, setOrders] = useState([]);
@@ -66,7 +67,7 @@ const History = () => {
 
         console.log("Order removed successfully from both MongoDB and state");
       } else {
-        alert("Advance feature not granted.");
+        toast.error("Advance feature not granted.");
         navigate("/advance");
       }
     } catch (error) {

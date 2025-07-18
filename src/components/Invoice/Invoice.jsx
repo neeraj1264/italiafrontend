@@ -16,7 +16,7 @@ import {
 import { IoMdCloseCircle } from "react-icons/io";
 import Header from "../header/Header";
 import { fetchProducts, removeProduct } from "../../api";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { IoClose } from "react-icons/io5";
 import { getAll, saveItems } from "../../DB";
@@ -558,7 +558,6 @@ useEffect(() => {
 
   return (
     <div>
-      <ToastContainer />
       <Header
         headerName="Urban Pizzeria"
         setSearch={setSearch}
