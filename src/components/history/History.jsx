@@ -18,6 +18,7 @@ const History = () => {
   const [showRemoveBtn, setShowRemoveBtn] = useState(false);
   const navigate = useNavigate();
   const [syncing, setSyncing] = useState(false);
+  const advanceFeatured = localStorage.getItem("advancedFeature") === "true";
 
   // Show remove button on long press
   let pressTimer;
@@ -49,10 +50,6 @@ const History = () => {
 
   const handleRemoveOrder = async (orderId) => {
     try {
-      // Check if 'advancefeatured' is true in localStorage
-      const advanceFeatured =
-        localStorage.getItem("advancedFeature") === "true";
-
       if (advanceFeatured) {
         // Proceed with the removal if advancefeatured is true
         await removeOrder(orderId);
@@ -86,7 +83,13 @@ const History = () => {
 
         const dayOrders = filterByDay(data, filter);
 
+      if (advanceFeatured) {
+        // Show full history
         setFilteredOrders(dayOrders);
+      } else {
+        // Show only latest order
+        setFilteredOrders(dayOrders.length > 0 ? [dayOrders[dayOrders.length - 1]] : []);
+      }
 
         // Calculate grand total for the day
         setGrandTotal(dayOrders.reduce((sum, o) => sum + o.totalAmount, 0));
@@ -94,7 +97,13 @@ const History = () => {
         const offline = await getAll("orders");
         setOrders(offline);
         const dayOrders = filterByDay(offline, filter);
+        const advanceFeatured = localStorage.getItem("advancedFeature") === "true";
+
+      if (advanceFeatured) {
         setFilteredOrders(dayOrders);
+      } else {
+        setFilteredOrders(dayOrders.length > 0 ? [dayOrders[dayOrders.length - 1]] : []);
+      }
         setGrandTotal(dayOrders.reduce((sum, o) => sum + o.totalAmount, 0));
       } finally {
         setLoading(false); // Stop loading
@@ -196,14 +205,6 @@ const History = () => {
     }
   };
 
-    useEffect(() => {
-    const isAdvancedEnabled =
-      localStorage.getItem("advancedFeature") === "true";
-
-    if (!isAdvancedEnabled) {
-      navigate("/invoice");
-    }
-  }, []);
   
   return (
     <div>
@@ -237,6 +238,7 @@ const History = () => {
           </div>
 
           <div className="history-container">
+            {advanceFeatured && (
             <div className="grand-total">
               <h2 className="total-sale">
                 <select
@@ -288,7 +290,7 @@ const History = () => {
                 </select>
               </h2>
             </div>
-
+)}
             {filteredOrders.length > 0 ? (
               [...filteredOrders].reverse().map((order, index) => (
                 <div
@@ -363,10 +365,11 @@ const History = () => {
 
                         {/* ICONS ROW */}
 
-                        {/*                         <tr>
+                      <tr>
                           <td colSpan={5} style={{ textAlign: "center" }}>
                       
                             <Rawbt3Inch
+                              save={false}
                               productsToSend={order.products}
                               customerPhone={order.phone}
                               customerName={order.name}
@@ -395,7 +398,7 @@ const History = () => {
                               )}
                             />
                           </td>
-                        </tr>*/}
+                        </tr>
                       </tbody>
                     </table>
                   )}

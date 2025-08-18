@@ -13,7 +13,7 @@ const Advance = ({ orders, setOrders }) => {
   const [normalCheckboxState, setNormalCheckboxState] = useState(false);
   const navigate = useNavigate();
 
-  const HARD_CODED_PASSWORD = "1947"; // Hardcoded password
+  const HARD_CODED_PASSWORD = "0002"; // Hardcoded password
 
   useEffect(() => {
     const advancedFeatureAccess = localStorage.getItem("advancedFeature");

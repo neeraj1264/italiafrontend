@@ -9,9 +9,10 @@ export default function Rawbt3Inch({
   customerPhone,
   customerName,
   customerAddress,
- icon: Icon,
+  icon: Icon,
   timestamp,
   includeGST = true,
+  save = true,   // ✅ new prop (default true)
 }){
 
   // Helper to calculate total price
@@ -174,27 +175,23 @@ ${detailedItems}
       timestamp: dateISO,
     };
 
-    // try {
-    //   await addItem("orders", order);
-    //   await addItem("customers", customerDataObject);
-    //   // optional: give user feedback
-    //   toast.success("Order saved to history", { autoClose: 1500 });
-    // } catch (err) {
-    //   console.error("Failed to save print history:", err);
-    //   toast.error("Could not save order history", { autoClose: 1500 });
-    // }
+    if (save) {
  try {
       await sendorder(order);
       await setdata(customerDataObject);
     } catch (err) {
       toast.info("Error sending online order:", err);
     }
-
+  }
     // Trigger RawBT
     window.location.href = rawBTUrl;
-
-    // a standard reload
-window.location.reload();
+    
+  // If save=false → don’t reload (optional)
+    if (save) {
+      window.location.reload();
+    } else {
+      setIsPrinting(false); // reset so button is usable again
+    }
 
   };
 

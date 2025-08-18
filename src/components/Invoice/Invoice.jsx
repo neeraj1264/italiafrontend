@@ -1,35 +1,18 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { FaFileInvoice, FaImage, FaTrash } from "react-icons/fa6";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./Invoice.css";
 import {
   FaMinusCircle,
   FaPlusCircle,
-  FaArrowRight,
-  FaBars,
   FaTimesCircle,
-  FaSearch,
-  FaEdit,
   FaShoppingCart,
 } from "react-icons/fa";
-// import { AiOutlineBars } from "react-icons/ai";
-import { IoMdCloseCircle } from "react-icons/io";
 import Header from "../header/Header";
 import { fetchProducts, removeProduct } from "../../api";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { IoClose } from "react-icons/io5";
 import { getAll, saveItems } from "../../DB";
 import Rawbt3Inch from "../Utils/Rawbt3Inch";
 
-const toastOptions = {
-  position: "bottom-right",
-  autoClose: 2000,
-  pauseOnHover: true,
-  draggable: true,
-  theme: "dark",
-  width: "90%",
-};
 const Invoice = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productsToSend, setProductsToSend] = useState([]);
@@ -42,66 +25,13 @@ const Invoice = () => {
   const [activeCategory, setActiveCategory] = useState("");
   const [includeGST, setIncludeGST] = useState(true);
 
-  const [isChecking, setIsChecking] = useState(false);
-
-  // default to “delivery”
-  const [orderType, setOrderType] = useState("delivery");
-
-  // two separate lists in localStorage
-  const [deliveryBills, setDeliveryBills] = useState(
-    () => JSON.parse(localStorage.getItem("deliveryKotData")) || []
-  );
-  const [dineInBills, setDineInBills] = useState(
-    () => JSON.parse(localStorage.getItem("dineInKotData")) || []
-  );
-
-  // tracks which list to show in the modal
-  const [modalType, setModalType] = useState("delivery"); // "delivery" or "dine-in"
-
-  const openBillsModal = (type) => {
-    setModalType(type);
-    setShowKotModal(true);
-  };
-
-  // State for modal visibility and data
-  const [showKotModal, setShowKotModal] = useState(false);
   const [now, setNow] = useState(Date.now());
-
-  const navigate = useNavigate(); // For navigation
 
   // Update `now` every second for countdown
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(interval);
   }, []);
-
-  // Format milliseconds to HH:mm:ss
-  const formatRemaining = (ms) => {
-    if (ms <= 0) return "00:00:00";
-    const totalSeconds = Math.floor(ms / 1000);
-    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
-    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(
-      2,
-      "0"
-    );
-    const seconds = String(totalSeconds % 60).padStart(2, "0");
-    return `${hours}:${minutes}:${seconds}`;
-  };
-
-  const [showRemoveBtn, setShowRemoveBtn] = useState(false);
-  let pressTimer;
-
-  const handlePressStart = () => {
-    // Set a timeout to show the remove button after 1 second (1000 ms)
-    pressTimer = setTimeout(() => {
-      setShowRemoveBtn(true);
-    }, 1000);
-  };
-
-  const handlePressEnd = () => {
-    // Clear the timeout if the user releases the press before 1 second
-    clearTimeout(pressTimer);
-  };
 
   const filteredProducts = selectedProducts
     .filter((product) =>
@@ -199,7 +129,6 @@ useEffect(() => {
   localStorage.removeItem("deliveryCharge");
 }, []);
 
-
   // Persist cart to IDB whenever it changes
   useEffect(() => {
     // clear old cart, then repopulate
@@ -233,12 +162,6 @@ useEffect(() => {
     handleOpenPopup(product);
   };
 
-  // useEffect(() => {
-  //   // Reset selectedVariety on popup close or when a new product is selected
-  //   setSelectedVariety([]);
-  // }, [showPopup]);
-
-  // Save selectedVariety to localStorage whenever it changes
   useEffect(() => {
     if (selectedVariety.length > 0) {
       localStorage.setItem("selectedVariety", JSON.stringify(selectedVariety));
@@ -406,37 +329,6 @@ useEffect(() => {
     );
   };
 
-  // Function to remove a product from selected products and productsToSend
-  const handleRemoveProduct = async (productName, productPrice) => {
-    try {
-      // Call the API function
-      await removeProduct(productName, productPrice);
-
-      // Remove product from the selectedProducts and productsToSend arrays
-      const updatedSelectedProducts = selectedProducts.filter(
-        (prod) => !(prod.name === productName && prod.price === productPrice)
-      );
-      const updatedProductsToSend = productsToSend.filter(
-        (prod) => !(prod.name === productName && prod.price === productPrice)
-      );
-
-      // Update the state
-      setSelectedProducts(updatedSelectedProducts);
-      setProductsToSend(updatedProductsToSend);
-
-      // Update localStorage
-      localStorage.setItem("products", JSON.stringify(updatedSelectedProducts));
-      localStorage.setItem(
-        "productsToSend",
-        JSON.stringify(updatedProductsToSend)
-      );
-
-      console.log("Product removed successfully from both MongoDB and state");
-    } catch (error) {
-      console.error("Error removing product:", error.message);
-    }
-  };
-
   // Helper function to calculate total price
   const calculateTotalPrice = (products = []) => {
     return products.reduce(
@@ -466,71 +358,6 @@ useEffect(() => {
 
   const toggleCategoryVisibility = () => {
     setIsCategoryVisible((prev) => !prev); // Toggle visibility
-  };
-
-  // New: KOT (Kitchen Order Ticket) print handler
-  const handleKot = () => {
-    // Append current order snapshot
-    const kotEntry = {
-      timestamp: Date.now(),
-      date: new Date().toLocaleString(),
-      items: productsToSend,
-      orderType,
-    };
-
-    if (orderType === "delivery") {
-      const next = [...deliveryBills, kotEntry];
-      setDeliveryBills(next);
-      localStorage.setItem("deliveryKotData", JSON.stringify(next));
-    } else {
-      const next = [...dineInBills, kotEntry];
-      setDineInBills(next);
-      localStorage.setItem("dineInKotData", JSON.stringify(next));
-    }
-
-    // Clear current productsToSend
-    setProductsToSend([]);
-    localStorage.setItem("productsToSend", JSON.stringify([]));
-
-    const printArea = document.getElementById("sample-section");
-    if (!printArea) {
-      console.warn("No sample-section found to print.");
-      return;
-    }
-
-    const header = `
-  <div style="text-align:center; font-weight:700; margin-bottom:8px;">
-    ${orderType === "delivery" ? "Delivery" : "Dine-In"}
-  </div>
-`;
-
-    const printContent = header + printArea.innerHTML;
-    const win = window.open("", "", "width=600,height=400");
-    const style = `<style>
-  @page { size: 48mm auto; margin:0; }
-  @media print {
-    body{ width:48mm; margin:0; padding:4mm; font-size:1rem; }
-    .product-item{ display:flex; justify-content:space-between; margin-bottom:1rem;}
-    .hr{ border:none; border-bottom:1px solid #000; margin:2px 0;}
-    .invoice-btn{ display:none; }
-  }
-</style>`;
-
-    win.document.write(
-      `<html>
-      <head>
-      <title>KOT Ticket</title>
-     ${style}
-        </head>
-        <body>
-        ${printContent}
-        </body>
-        </html>`
-    );
-    win.document.close();
-    win.focus();
-    win.print();
-    win.close();
   };
 
   // define whatever cats you really want up top:
@@ -800,6 +627,7 @@ useEffect(() => {
                 </div>
 
                 <Rawbt3Inch
+                  save={true}
                   className="kot-btn"
                   productsToSend={productsToSend}
                   includeGST={includeGST}
