@@ -12,6 +12,7 @@ import { fetchProducts, removeProduct } from "../../api";
 import "react-toastify/dist/ReactToastify.css";
 import { getAll, saveItems } from "../../DB";
 import Rawbt3Inch from "../Utils/Rawbt3Inch";
+import UsbPrint from "../Utils/UsbPrint";
 
 const Invoice = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -625,20 +626,22 @@ useEffect(() => {
                     Include GST (5%)
                   </label>
                 </div>
-
-                <Rawbt3Inch
-                  save={true}
-                  className="kot-btn"
-                  productsToSend={productsToSend}
-                  includeGST={includeGST}
-                />
-                {/* <button
-                  onClick={handleKot}
-                  className="kot-btn"
-                  style={{ borderRadius: "0" }}
-                >
-                  <h2> Print Kot </h2>
-                </button> */}
+               
+                 {localStorage.getItem("printerType") === "usb" ? (
+                              <UsbPrint
+                                save={true}
+                                productsToSend={productsToSend}
+                                includeGST={includeGST}
+                                className="kot-btn"
+                                    />
+                            ) : (
+                              <Rawbt3Inch
+                                save={true}
+                                productsToSend={productsToSend}
+                                includeGST={includeGST}
+                                className="kot-btn"
+                              />
+                            )}
               </>
             </div>
           </div>

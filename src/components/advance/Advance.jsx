@@ -12,7 +12,10 @@ const Advance = ({ orders, setOrders }) => {
   const [advancedCheckboxState, setAdvancedCheckboxState] = useState(false);
   const [normalCheckboxState, setNormalCheckboxState] = useState(false);
   const navigate = useNavigate();
-
+     // ✅ new state for printerType
+  const [printerType, setPrinterType] = useState(
+    localStorage.getItem("printerType")
+  );
   const HARD_CODED_PASSWORD = "0002"; // Hardcoded password
 
   useEffect(() => {
@@ -66,6 +69,10 @@ const Advance = ({ orders, setOrders }) => {
     }
   };
 
+   useEffect(() => {
+    localStorage.setItem("printerType", printerType);
+  }, [printerType]);
+
   return (
     <>
       <Header />
@@ -81,7 +88,6 @@ const Advance = ({ orders, setOrders }) => {
             <h4>Access Advanced Features</h4>
           </label>
         </div>
-
         {/* Normal Features Checkbox */}
         <div className="checkbox-container">
           <label>
@@ -94,7 +100,37 @@ const Advance = ({ orders, setOrders }) => {
             <h4>Employee</h4>
           </label>
         </div>
+        <div className="checkbox-container">
+          <label>
+            <input
+              className="PrinterTypeContainer"
+              type="radio"
+              name="printerType"
+              value="rawbt"
+              checked={localStorage.getItem("printerType") === "rawbt"}
+              onChange={() => {
+                 setPrinterType("rawbt");
+                toast.info("Switched to RawBT printing");
+              }}
+            />
+            Mobile Printing
+          </label>
 
+          <label>
+            <input
+              className="PrinterTypeContainer"
+              type="radio"
+              name="printerType"
+              value="usb"
+              checked={localStorage.getItem("printerType") === "usb"}
+              onChange={() => {
+                setPrinterType("usb");
+                toast.info("Switched to USB printing");
+              }}
+            />
+            USB Printing (PC)
+          </label>
+        </div>
         {/* Password Popup */}
         {showPasswordPopup && (
           <div className="advance-password-popup">

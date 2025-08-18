@@ -457,7 +457,7 @@ h3 {
   margin: 0;
 }
 
-input[type="checkbox"] {
+input[type="checkbox"] , input[type="radio"] {
   accent-color: var(--bg); /* Set your desired color */
 }
 

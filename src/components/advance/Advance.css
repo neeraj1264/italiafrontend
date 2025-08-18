@@ -117,3 +117,6 @@
     background: #c0392b;
   }
   
+  .PrinterTypeContainer{
+    margin: 0.2rem 0 !important;
+  }

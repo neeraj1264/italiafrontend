@@ -7,6 +7,7 @@ import Header from "../header/Header";
 import { clearStore, deleteItem, getAll, saveItems } from "../../DB";
 import Rawbt3Inch from "../Utils/Rawbt3Inch";
 import { toast } from "react-toastify";
+import UsbPrint from "../Utils/UsbPrint";
 
 const History = () => {
   const [orders, setOrders] = useState([]);
@@ -83,13 +84,15 @@ const History = () => {
 
         const dayOrders = filterByDay(data, filter);
 
-      if (advanceFeatured) {
-        // Show full history
-        setFilteredOrders(dayOrders);
-      } else {
-        // Show only latest order
-        setFilteredOrders(dayOrders.length > 0 ? [dayOrders[dayOrders.length - 1]] : []);
-      }
+        if (advanceFeatured) {
+          // Show full history
+          setFilteredOrders(dayOrders);
+        } else {
+          // Show only latest order
+          setFilteredOrders(
+            dayOrders.length > 0 ? [dayOrders[dayOrders.length - 1]] : []
+          );
+        }
 
         // Calculate grand total for the day
         setGrandTotal(dayOrders.reduce((sum, o) => sum + o.totalAmount, 0));
@@ -97,13 +100,16 @@ const History = () => {
         const offline = await getAll("orders");
         setOrders(offline);
         const dayOrders = filterByDay(offline, filter);
-        const advanceFeatured = localStorage.getItem("advancedFeature") === "true";
+        const advanceFeatured =
+          localStorage.getItem("advancedFeature") === "true";
 
-      if (advanceFeatured) {
-        setFilteredOrders(dayOrders);
-      } else {
-        setFilteredOrders(dayOrders.length > 0 ? [dayOrders[dayOrders.length - 1]] : []);
-      }
+        if (advanceFeatured) {
+          setFilteredOrders(dayOrders);
+        } else {
+          setFilteredOrders(
+            dayOrders.length > 0 ? [dayOrders[dayOrders.length - 1]] : []
+          );
+        }
         setGrandTotal(dayOrders.reduce((sum, o) => sum + o.totalAmount, 0));
       } finally {
         setLoading(false); // Stop loading
@@ -205,7 +211,6 @@ const History = () => {
     }
   };
 
-  
   return (
     <div>
       <Header headerName="Order History" />
@@ -239,58 +244,58 @@ const History = () => {
 
           <div className="history-container">
             {advanceFeatured && (
-            <div className="grand-total">
-              <h2 className="total-sale">
-                <select
-                  id="filter"
-                  value={filter}
-                  onChange={handleFilterChange}
-                  style={{ borderRadius: "1rem" }}
-                >
-                  <option value="Today">
-                    Today ₹
-                    {orders
-                      .filter(
-                        (order) =>
-                          new Date(order.timestamp).toLocaleDateString() ===
-                          new Date().toLocaleDateString()
-                      )
-                      .reduce((sum, order) => sum + order.totalAmount, 0)}
-                  </option>
-                  <option value="Yesterday">
-                    Yesterday ₹
-                    {orders
-                      .filter((order) => {
-                        const orderDate = new Date(order.timestamp);
-                        const yesterday = new Date();
-                        yesterday.setDate(yesterday.getDate() - 1);
-                        return (
-                          orderDate.toLocaleDateString() ===
-                          yesterday.toLocaleDateString()
-                        );
-                      })
-                      .reduce((sum, order) => sum + order.totalAmount, 0)}
-                  </option>
-                  {[...Array(6)].map((_, i) => (
-                    <option key={i} value={`${i + 2} days ago`}>
-                      {i + 2} days ago ₹
+              <div className="grand-total">
+                <h2 className="total-sale">
+                  <select
+                    id="filter"
+                    value={filter}
+                    onChange={handleFilterChange}
+                    style={{ borderRadius: "1rem" }}
+                  >
+                    <option value="Today">
+                      Today ₹
+                      {orders
+                        .filter(
+                          (order) =>
+                            new Date(order.timestamp).toLocaleDateString() ===
+                            new Date().toLocaleDateString()
+                        )
+                        .reduce((sum, order) => sum + order.totalAmount, 0).toFixed(2)}
+                    </option>
+                    <option value="Yesterday">
+                      Yesterday ₹
                       {orders
                         .filter((order) => {
                           const orderDate = new Date(order.timestamp);
-                          const filterDate = new Date();
-                          filterDate.setDate(filterDate.getDate() - (i + 2));
+                          const yesterday = new Date();
+                          yesterday.setDate(yesterday.getDate() - 1);
                           return (
                             orderDate.toLocaleDateString() ===
-                            filterDate.toLocaleDateString()
+                            yesterday.toLocaleDateString()
                           );
                         })
                         .reduce((sum, order) => sum + order.totalAmount, 0)}
                     </option>
-                  ))}
-                </select>
-              </h2>
-            </div>
-)}
+                    {[...Array(6)].map((_, i) => (
+                      <option key={i} value={`${i + 2} days ago`}>
+                        {i + 2} days ago ₹
+                        {orders
+                          .filter((order) => {
+                            const orderDate = new Date(order.timestamp);
+                            const filterDate = new Date();
+                            filterDate.setDate(filterDate.getDate() - (i + 2));
+                            return (
+                              orderDate.toLocaleDateString() ===
+                              filterDate.toLocaleDateString()
+                            );
+                          })
+                          .reduce((sum, order) => sum + order.totalAmount, 0)}
+                      </option>
+                    ))}
+                  </select>
+                </h2>
+              </div>
+            )}
             {filteredOrders.length > 0 ? (
               [...filteredOrders].reverse().map((order, index) => (
                 <div
@@ -365,38 +370,45 @@ const History = () => {
 
                         {/* ICONS ROW */}
 
-                      <tr>
+                        <tr>
                           <td colSpan={5} style={{ textAlign: "center" }}>
-                      
-                            <Rawbt3Inch
-                              save={false}
-                              productsToSend={order.products}
-                              customerPhone={order.phone}
-                              customerName={order.name}
-                              customerAddress={order.address}
-                              deliveryChargeAmount={order.delivery}
-                              parsedDiscount={order.discount}
-                              timestamp={order.timestamp}
-                              includeGST={order.includeGST}
-                              icon={() => (
-                                <FaPrint
-                                  size={32}
-                                  style={{
-                                    color: "#1abc9c",
-                                    transition: "transform 0.1s ease",
-                                    textAlign: "center",
-                                  }} 
-                                  onMouseEnter={(e) =>
-                                    (e.currentTarget.style.transform =
-                                      "scale(1.2)")
-                                  }
-                                  onMouseLeave={(e) =>
-                                    (e.currentTarget.style.transform =
-                                      "scale(1)")
-                                  }
-                                />
-                              )}
-                            />
+                            {localStorage.getItem("printerType") === "usb" ? (
+                              <UsbPrint
+                                save={false}
+                                productsToSend={order.products}
+                                customerPhone={order.phone}
+                                customerName={order.name}
+                                customerAddress={order.address}
+                                deliveryChargeAmount={order.delivery}
+                                parsedDiscount={order.discount}
+                                timestamp={order.timestamp}
+                                includeGST={order.includeGST}
+                                icon={() => (
+                                  <FaPrint
+                                    size={32}
+                                    style={{ color: "#1abc9c" }}
+                                  />
+                                )}
+                              />
+                            ) : (
+                              <Rawbt3Inch
+                                save={false}
+                                productsToSend={order.products}
+                                customerPhone={order.phone}
+                                customerName={order.name}
+                                customerAddress={order.address}
+                                deliveryChargeAmount={order.delivery}
+                                parsedDiscount={order.discount}
+                                timestamp={order.timestamp}
+                                includeGST={order.includeGST}
+                                icon={() => (
+                                  <FaPrint
+                                    size={32}
+                                    style={{ color: "#1abc9c" }}
+                                  />
+                                )}
+                              />
+                            )}
                           </td>
                         </tr>
                       </tbody>
