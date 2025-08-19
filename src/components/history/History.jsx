@@ -20,6 +20,8 @@ const History = () => {
   const navigate = useNavigate();
   const [syncing, setSyncing] = useState(false);
   const advanceFeatured = localStorage.getItem("advancedFeature") === "true";
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState(null);
 
   // Show remove button on long press
   let pressTimer;
@@ -49,27 +51,39 @@ const History = () => {
     });
   };
 
-  const handleRemoveOrder = async (orderId) => {
+  const confirmDeleteOrder = (orderId) => {
+    if (advanceFeatured) {
+      setOrderToDelete(orderId);
+      setShowConfirmModal(true);
+    } else {
+      toast.error("You don’t have permission to delete this order. Please contact admin.");
+    }
+  };
+
+  const handleRemoveOrder = async () => {
+    if (!orderToDelete) return;
+
     try {
       if (advanceFeatured) {
-        // Proceed with the removal if advancefeatured is true
-        await removeOrder(orderId);
+        await removeOrder(orderToDelete);
 
-        // Remove the order from the state
-        const updatedOrders = orders.filter((order) => order.id !== orderId);
+        const updatedOrders = orders.filter(
+          (order) => order.id !== orderToDelete
+        );
         setOrders(updatedOrders);
-
-        setFilteredOrders((prevFilteredOrders) =>
-          prevFilteredOrders.filter((order) => order.id !== orderId)
+        setFilteredOrders((prev) =>
+          prev.filter((order) => order.id !== orderToDelete)
         );
 
-        console.log("Order removed successfully from both MongoDB and state");
+        toast.success("Order removed successfully!");
       } else {
         toast.error("Advance feature not granted.");
-        navigate("/advance");
       }
     } catch (error) {
       console.error("Error removing order:", error.message);
+    } finally {
+      setShowConfirmModal(false);
+      setOrderToDelete(null);
     }
   };
 
@@ -260,7 +274,8 @@ const History = () => {
                             new Date(order.timestamp).toLocaleDateString() ===
                             new Date().toLocaleDateString()
                         )
-                        .reduce((sum, order) => sum + order.totalAmount, 0).toFixed(2)}
+                        .reduce((sum, order) => sum + order.totalAmount, 0)
+                        .toFixed(2)}
                     </option>
                     <option value="Yesterday">
                       Yesterday ₹
@@ -324,7 +339,7 @@ const History = () => {
                     {showRemoveBtn && (
                       <button
                         className="remove-btn"
-                        onClick={() => handleRemoveOrder(order.id)}
+                        onClick={() => confirmDeleteOrder(order.id)}
                       >
                         Remove Order
                       </button>
@@ -421,6 +436,32 @@ const History = () => {
             )}
           </div>
         </>
+      )}
+
+      {showConfirmModal && (
+        <div className="modal-delete-overlay">
+          <div className="modal-delete-content">
+            <h3>Are you sure?</h3>
+            <p>
+              This action <strong>cannot be undone</strong>. If you click{" "}
+              <b>Yes</b>, this order will be{" "}
+              <span style={{ color: "red" }}>permanently deleted</span>.
+            </p>
+            <div className="modal-delete-actions">
+              <button
+                onClick={handleRemoveOrder}
+                style={{
+                  background: "red",
+                  color: "white",
+                  marginRight: "10px",
+                }}
+              >
+                Yes, Delete
+              </button>
+              <button onClick={() => setShowConfirmModal(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

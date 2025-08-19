@@ -19,8 +19,7 @@ export default function Rawbt3Inch({
   const calculateTotalPrice = (items = []) =>
     items.reduce((sum, p) => sum + p.price * (p.quantity || 1), 0);
 
-  const [isPrinting, setIsPrinting] = useState(false);
-
+ const [isPrinting, setIsPrinting] = useState(false);
  const handleRawBTPrint = async() => {
 
   // guard: ignore if already in progress
@@ -185,7 +184,7 @@ ${detailedItems}
   }
     // Trigger RawBT
     window.location.href = rawBTUrl;
-    
+
   // If save=false → don’t reload (optional)
     if (save) {
       window.location.reload();
@@ -204,7 +203,9 @@ ${detailedItems}
         disabled={isPrinting}
       style={{ opacity: isPrinting ? 0.5 : 1, cursor: isPrinting ? "not-allowed" : "pointer" }}
 
-        >Mobile Print</button>
+        >
+         {isPrinting ? "Printing..." : "Mobile Print"} 
+          </button>
       )}
       </div>
   );

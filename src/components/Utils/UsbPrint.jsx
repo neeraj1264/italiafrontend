@@ -18,25 +18,27 @@ export default function UsbPrint({
   const calculateTotalPrice = (items = []) =>
     items.reduce((sum, p) => sum + p.price * (p.quantity || 1), 0);
 
-      const date = timestamp ? new Date(timestamp) : new Date();
-    const formattedDate = date.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-    const formattedTime = date.toLocaleTimeString("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    });
+  const date = timestamp ? new Date(timestamp) : new Date();
+  const formattedDate = date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+  const formattedTime = date.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
 
-        const itemTotal = calculateTotalPrice(productsToSend);
-    const gstAmount = includeGST ? +(itemTotal * 0.05).toFixed(2) : 0;
-    const netTotal = itemTotal + gstAmount;
-    
+  const itemTotal = calculateTotalPrice(productsToSend);
+  const gstAmount = includeGST ? +(itemTotal * 0.05).toFixed(2) : 0;
+  const netTotal = itemTotal + gstAmount;
+
   const handleUsbPrint = async () => {
-     try {
+    try {
+        setIsPrinting(true);
+
       const kotContent = document.getElementById("mobileinvoice").innerHTML;
 
       const newWindow = window.open("", "", "width=600,height=400");
@@ -95,47 +97,47 @@ export default function UsbPrint({
         newWindow.focus();
         newWindow.print();
         newWindow.close();
-    // 👉 Save to DB just like RawBT
-      if (save) {
-        const orderId = `order_${Date.now()}`;
-        const dateISO = new Date(timestamp || Date.now()).toISOString();
+        // 👉 Save to DB just like RawBT
+        if (save) {
+          const orderId = `order_${Date.now()}`;
+          const dateISO = new Date(timestamp || Date.now()).toISOString();
 
-        const order = {
-          id: orderId,
-          products: productsToSend,
-          totalAmount: netTotal,
-          name: customerName,
-          phone: customerPhone,
-          address: customerAddress,
-          timestamp: dateISO,
-          gstAmount,
-          includeGST,
-        };
+          const order = {
+            id: orderId,
+            products: productsToSend,
+            totalAmount: netTotal,
+            name: customerName,
+            phone: customerPhone,
+            address: customerAddress,
+            timestamp: dateISO,
+            gstAmount,
+            includeGST,
+          };
 
-        const customerDataObject = {
-          id: orderId,
-          name: customerName,
-          phone: customerPhone,
-          address: customerAddress,
-          timestamp: dateISO,
-        };
+          const customerDataObject = {
+            id: orderId,
+            name: customerName,
+            phone: customerPhone,
+            address: customerAddress,
+            timestamp: dateISO,
+          };
 
-        try {
-          await sendorder(order);
-          await setdata(customerDataObject);
-        } catch (err) {
-          toast.info("Error saving USB order:", err);
+          try {
+            await sendorder(order);
+            await setdata(customerDataObject);
+          } catch (err) {
+            toast.info("Error saving USB order:", err);
+          }
+
+          // Reload if save=true
+          window.location.reload();
+        } else {
+          setIsPrinting(false);
         }
-
-        // Reload if save=true
-        window.location.reload();
-      } else {
-        setIsPrinting(false);
-      }
-    };
-  } catch (error) {
-    console.error("Error generating printable content:", error);
-  }
+      };
+    } catch (error) {
+      console.error("Error generating printable content:", error);
+    }
   };
 
   return (
@@ -152,7 +154,7 @@ export default function UsbPrint({
               cursor: isPrinting ? "not-allowed" : "pointer",
             }}
           >
-            USB Print
+            {isPrinting ? "Printing..." : "USB Print"}
           </button>
         )}
       </div>
@@ -174,7 +176,7 @@ export default function UsbPrint({
           <h1
             style={{ textAlign: "center", margin: ".5rem", fontSize: "25px" }}
           >
-           Pizza Italia
+            Pizza Italia
           </h1>
           <p
             style={{
@@ -248,6 +250,16 @@ export default function UsbPrint({
               ))}
             </tbody>
           </table>
+          {includeGST && (
+            <>
+              <p style={{ fontSize: "15px", margin: "2px 0", display: "flex" , justifyContent: "space-between" }}>
+                Item Total: <span>₹{itemTotal.toFixed(2)}</span>
+              </p>
+              <p style={{ fontSize: "15px", margin: "2px 0", display: "flex" , justifyContent: "space-between" }}>
+                GST (5%): <span>+{gstAmount.toFixed(2)}</span>
+              </p>
+            </>
+          )}
           <p className="totalAmount">Net Total: ₹{netTotal.toFixed(2)}</p>{" "}
           <hr />
           <div
