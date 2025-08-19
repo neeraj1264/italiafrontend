@@ -37,7 +37,7 @@ export default function UsbPrint({
 
   const handleUsbPrint = async () => {
     try {
-        setIsPrinting(true);
+      setIsPrinting(true);
 
       const kotContent = document.getElementById("mobileinvoice").innerHTML;
 
@@ -169,12 +169,12 @@ export default function UsbPrint({
         <div
           style={{
             border: "2px dotted",
-            margin: "0 0 5px 0",
+            margin: "0 0 10px 0",
             padding: ".4rem",
           }}
         >
           <h1
-            style={{ textAlign: "center", margin: ".5rem", fontSize: "25px" }}
+            style={{ textAlign: "center", margin: ".5rem", fontSize: "35px" }}
           >
             Pizza Italia
           </h1>
@@ -202,7 +202,9 @@ export default function UsbPrint({
             <p style={{ fontSize: "16px", margin: "0" }}>
               Date:&nbsp;&nbsp;&nbsp;&nbsp;{formattedDate + " " + formattedTime}
             </p>
-
+            <p style={{ fontSize: "16px", margin: "0" }}>
+              Bill No:&nbsp;&nbsp;#{Math.floor(1000 + Math.random() * 9000)}
+            </p>
             {customerName && (
               <p style={{ fontSize: "16px", margin: "0" }}>
                 Customer&nbsp;:&nbsp;{customerName}
@@ -252,10 +254,24 @@ export default function UsbPrint({
           </table>
           {includeGST && (
             <>
-              <p style={{ fontSize: "15px", margin: "2px 0", display: "flex" , justifyContent: "space-between" }}>
+              <p
+                style={{
+                  fontSize: "15px",
+                  margin: "2px 0",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
                 Item Total: <span>₹{itemTotal.toFixed(2)}</span>
               </p>
-              <p style={{ fontSize: "15px", margin: "2px 0", display: "flex" , justifyContent: "space-between" }}>
+              <p
+                style={{
+                  fontSize: "15px",
+                  margin: "2px 0",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
                 GST (5%): <span>+{gstAmount.toFixed(2)}</span>
               </p>
             </>
@@ -270,6 +286,10 @@ export default function UsbPrint({
             }}
           >
             Thank You Visit Again!
+            <br />
+            <span style={{ fontSize: "12px", fontStyle: "italic", textAlign: "center", color: "gray" }}>
+              Powered by Billzo | 70158-23645
+            </span>
           </div>
         </div>
       </div>
