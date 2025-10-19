@@ -289,7 +289,8 @@ const History = () => {
                             yesterday.toLocaleDateString()
                           );
                         })
-                        .reduce((sum, order) => sum + order.totalAmount, 0)}
+                        .reduce((sum, order) => sum + order.totalAmount, 0)
+                        .toFixed(2)}
                     </option>
                     {[...Array(6)].map((_, i) => (
                       <option key={i} value={`${i + 2} days ago`}>
@@ -304,7 +305,8 @@ const History = () => {
                               filterDate.toLocaleDateString()
                             );
                           })
-                          .reduce((sum, order) => sum + order.totalAmount, 0)}
+                          .reduce((sum, order) => sum + order.totalAmount, 0)
+                          .toFixed(2)}
                       </option>
                     ))}
                   </select>
