@@ -190,7 +190,7 @@ export default function UsbPrint({
             <br />
             Pipli Road Kurukshetra,
             <br />
-            99922-20610 99922-20610
+            99922-20610 99922-20611
             <br />
             GstNo: 06QTIPS7467A1Z1
           </p>
