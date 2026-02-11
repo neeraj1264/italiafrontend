@@ -186,11 +186,11 @@ export default function UsbPrint({
               padding: "0 2px",
             }}
           >
-            Opposite Bajaj Bike Agency,
+            Opposite New Bus Stand,
             <br />
-            Kaithal Road Pehowa,
+            Pipli Road Kurukshetra,
             <br />
-            72220-06000 99922-71872
+            99922-20610 99922-20610
             <br />
             GstNo: 06QTIPS7467A1Z1
           </p>
